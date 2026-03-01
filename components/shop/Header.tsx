@@ -2,13 +2,16 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Search, Heart, ShoppingCart, User, Menu } from 'lucide-react';
+import { Search, Heart, ShoppingCart, User, Menu, X } from 'lucide-react';
 import { CurrencySelector } from './CurrencySelector';
 import { MobileMenu } from './MobileMenu';
+import { SearchBar } from './SearchBar';
 import { NAV_LINKS } from '@/lib/constants';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 export function Header(): JSX.Element {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
+  const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
 
   return (
     <header className="sticky top-0 z-40 bg-white border-b shadow-sm">
@@ -41,14 +44,19 @@ export function Header(): JSX.Element {
           </nav>
 
           <div className="flex items-center gap-4">
-            <CurrencySelector />
+            <div className="hidden md:block w-64">
+              <SearchBar />
+            </div>
 
             <button
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              className="md:hidden p-2 hover:bg-gray-100 rounded-full transition-colors"
+              onClick={() => setIsSearchOpen(true)}
               aria-label="Search"
             >
               <Search className="h-5 w-5" />
             </button>
+
+            <CurrencySelector />
 
             <Link
               href="/wishlist"
@@ -84,6 +92,14 @@ export function Header(): JSX.Element {
       </div>
 
       <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
+
+      <Dialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <div className="py-4">
+            <SearchBar />
+          </div>
+        </DialogContent>
+      </Dialog>
     </header>
   );
 }

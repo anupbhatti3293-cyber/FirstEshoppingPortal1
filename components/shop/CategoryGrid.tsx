@@ -17,7 +17,7 @@ export function CategoryGrid(): JSX.Element {
           {CATEGORIES.map((category) => (
             <Link
               key={category.id}
-              href={`/category/${category.slug}`}
+              href={`/products/category/${category.slug}`}
               className="group relative aspect-[4/5] overflow-hidden rounded-lg"
             >
               <Image
