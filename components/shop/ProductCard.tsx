@@ -3,7 +3,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Heart, Eye, ShoppingCart } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Product, Currency } from '@/types';
 import { RatingStars } from './RatingStars';
 import { PriceDisplay } from './PriceDisplay';
@@ -18,12 +19,50 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, currency = 'USD', onQuickView }: ProductCardProps): JSX.Element {
-  const [isWishlisted, setIsWishlisted] = useState(false);
+  const router = useRouter();
+  const [isWishlisted, setIsWishlisted] = useState<boolean>(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const mainImage = product.images && product.images.length > 0 ? product.images[0].url : '';
   const isOnSale = product.sale_price_usd !== null && product.sale_price_usd !== undefined;
   const isOutOfStock = product.stock_quantity <= 0 && !product.allow_backorder;
   const isNew = product.tags.includes('new');
   const isTrending = product.tags.includes('trending');
+
+  useEffect(() => {
+    checkAuthAndWishlist();
+  }, []);
+
+  async function checkAuthAndWishlist(): Promise<void> {
+    try {
+      const response = await fetch('/api/auth/me');
+      const result = await response.json();
+
+      if (result.success) {
+        setIsLoggedIn(true);
+        checkIfWishlisted();
+      } else {
+        const localWishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+        setIsWishlisted(localWishlist.includes(product.id));
+      }
+    } catch (error) {
+      const localWishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+      setIsWishlisted(localWishlist.includes(product.id));
+    }
+  }
+
+  async function checkIfWishlisted(): Promise<void> {
+    try {
+      const response = await fetch('/api/wishlist');
+      const result = await response.json();
+
+      if (result.success) {
+        const isInWishlist = result.data.some((item: any) => item.product_id === product.id);
+        setIsWishlisted(isInWishlist);
+      }
+    } catch (error) {
+      // Failed to check wishlist
+    }
+  }
 
   const getBadgeVariant = (type: string): 'default' | 'destructive' | 'secondary' => {
     if (type === 'sale') return 'destructive';
@@ -38,10 +77,45 @@ export function ProductCard({ product, currency = 'USD', onQuickView }: ProductC
     }
   };
 
-  const handleWishlist = (e: React.MouseEvent): void => {
+  async function handleWishlist(e: React.MouseEvent): Promise<void> {
     e.preventDefault();
-    setIsWishlisted(!isWishlisted);
-  };
+
+    if (!isLoggedIn) {
+      const localWishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+      if (isWishlisted) {
+        const updated = localWishlist.filter((id: number) => id !== product.id);
+        localStorage.setItem('wishlist', JSON.stringify(updated));
+        setIsWishlisted(false);
+      } else {
+        localWishlist.push(product.id);
+        localStorage.setItem('wishlist', JSON.stringify(localWishlist));
+        setIsWishlisted(true);
+      }
+      return;
+    }
+
+    try {
+      if (isWishlisted) {
+        const wishlistResponse = await fetch('/api/wishlist');
+        const wishlistResult = await wishlistResponse.json();
+        const item = wishlistResult.data.find((item: any) => item.product_id === product.id);
+
+        if (item) {
+          await fetch(`/api/wishlist/${item.id}`, { method: 'DELETE' });
+          setIsWishlisted(false);
+        }
+      } else {
+        await fetch('/api/wishlist', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ productId: product.id }),
+        });
+        setIsWishlisted(true);
+      }
+    } catch (error) {
+      console.error('Failed to update wishlist:', error);
+    }
+  }
 
   const handleAddToCart = (e: React.MouseEvent): void => {
     e.preventDefault();
