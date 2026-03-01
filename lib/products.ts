@@ -145,14 +145,15 @@ export async function searchProducts(query: string, limit: number = 5, currency:
       category,
       base_price_usd,
       base_price_gbp,
-      product_images!inner(url)
+      product_images(url)
     `)
     .eq('tenant_id', TENANT_ID)
     .eq('is_active', true)
-    .or(`name.ilike.%${query}%,description.ilike.%${query}%`)
+    .or(`name.ilike.%${query}%,description.ilike.%${query}%,short_description.ilike.%${query}%,category.ilike.%${query}%`)
     .limit(limit);
 
   if (error || !data) {
+    console.error('Search error:', error);
     return [];
   }
 
@@ -161,7 +162,7 @@ export async function searchProducts(query: string, limit: number = 5, currency:
     name: product.name,
     slug: product.slug,
     category: product.category,
-    image: product.product_images[0]?.url || '',
+    image: product.product_images?.[0]?.url || '',
     price_usd: product.base_price_usd,
     price_gbp: product.base_price_gbp,
   }));

@@ -219,22 +219,22 @@ export const TRUST_SIGNALS = [
 ] as const;
 
 export const NAV_LINKS = [
-  { name: 'Jewellery', href: '/category/jewellery' },
-  { name: 'Clothing', href: '/category/clothing' },
-  { name: 'Purses & Bags', href: '/category/purses-bags' },
-  { name: 'Beauty', href: '/category/beauty' },
-  { name: 'Deals', href: '/deals' },
-  { name: 'New Arrivals', href: '/new-arrivals' },
+  { name: 'Jewellery', href: '/products/category/jewellery' },
+  { name: 'Clothing', href: '/products/category/clothing' },
+  { name: 'Purses & Bags', href: '/products/category/purses-bags' },
+  { name: 'Beauty', href: '/products/category/beauty' },
+  { name: 'Deals', href: '/products?tags=sale' },
+  { name: 'New Arrivals', href: '/products?tags=new' },
 ] as const;
 
 export const FOOTER_LINKS = {
   shop: [
     { name: 'All Products', href: '/products' },
-    { name: 'Jewellery', href: '/category/jewellery' },
-    { name: 'Clothing', href: '/category/clothing' },
-    { name: 'Purses & Bags', href: '/category/purses-bags' },
-    { name: 'Beauty', href: '/category/beauty' },
-    { name: 'Sale', href: '/sale' },
+    { name: 'Jewellery', href: '/products/category/jewellery' },
+    { name: 'Clothing', href: '/products/category/clothing' },
+    { name: 'Purses & Bags', href: '/products/category/purses-bags' },
+    { name: 'Beauty', href: '/products/category/beauty' },
+    { name: 'Sale', href: '/products?tags=sale' },
   ],
   company: [
     { name: 'About Us', href: '/about' },
