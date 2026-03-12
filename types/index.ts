@@ -42,6 +42,7 @@ export interface ProductReview {
   title: string | null;
   content: string | null;
   is_verified_purchase: boolean;
+  is_approved: boolean;
   helpful_count: number;
   created_at: string;
 }

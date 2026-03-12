@@ -140,7 +140,7 @@ export async function getProductBySlug(
   );
   const variants = data.product_variants ?? [];
   const reviews = (data.product_reviews ?? []).filter(
-    (r: NonNullable<Product['reviews']>[number]) => r.is_approved !== false
+    (r: NonNullable<Product['reviews']>[number]) => r.is_approved === true
   );
 
   return {

@@ -68,7 +68,7 @@ export default function ProductsPage(): JSX.Element {
     fetchProducts();
   }, [filters, sort, page, currency]);
 
-  type ActiveFilters = { categories: string[]; minPrice?: number; maxPrice?: number; rating?: number; inStock: boolean; tags: string[] };
+  type ActiveFilters = { categories: string[]; minPrice?: number; maxPrice?: number; rating?: number; inStock?: boolean; tags: string[] };
 
   const updateURL = (newFilters: ActiveFilters, newSort?: string, newPage?: number): void => {
     const params = new URLSearchParams();
