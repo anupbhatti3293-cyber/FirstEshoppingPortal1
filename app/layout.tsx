@@ -8,6 +8,7 @@ import { CookieConsent } from '@/components/shop/CookieConsent';
 import { Toaster } from '@/components/ui/toaster';
 import { CurrencyProvider } from '@/lib/currencyContext';
 import { AuthProvider } from '@/lib/authContext';
+import { CartProvider } from '@/lib/cartContext';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair' });
@@ -73,12 +74,14 @@ export default function RootLayout({
       <body className="min-h-screen flex flex-col">
         <CurrencyProvider>
           <AuthProvider>
-            <AnnouncementBar messages={ANNOUNCEMENT_MESSAGES} />
-            <Header />
-            <main className="flex-1">{children}</main>
-            <Footer />
-            <CookieConsent />
-            <Toaster />
+            <CartProvider>
+              <AnnouncementBar messages={ANNOUNCEMENT_MESSAGES} />
+              <Header />
+              <main className="flex-1">{children}</main>
+              <Footer />
+              <CookieConsent />
+              <Toaster />
+            </CartProvider>
           </AuthProvider>
         </CurrencyProvider>
       </body>

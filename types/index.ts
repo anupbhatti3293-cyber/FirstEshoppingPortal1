@@ -15,6 +15,7 @@ export interface ProductImage {
   url: string;
   alt_text: string | null;
   position: number;
+  is_primary: boolean;
   width: number | null;
   height: number | null;
 }
@@ -426,4 +427,245 @@ export interface AutomationDashboardMetrics {
   jobs_failed_24h: number;
   products_synced_today: number;
   last_sync_at: string | null;
+}
+
+// ─────────────────────────────────────────────
+// CART & ORDER TYPES (migration 006)
+// ─────────────────────────────────────────────
+
+export type OrderStatus =
+  | 'PENDING_PAYMENT'
+  | 'PROCESSING'
+  | 'SHIPPED'
+  | 'OUT_FOR_DELIVERY'
+  | 'DELIVERED'
+  | 'CANCELLED'
+  | 'REFUNDED'
+  | 'PARTIALLY_REFUNDED';
+
+export type DiscountType = 'PERCENTAGE' | 'FIXED_AMOUNT' | 'FREE_SHIPPING';
+export type ShippingMethod = 'STANDARD' | 'EXPRESS';
+
+export interface CartItem {
+  id: number;
+  tenant_id: number;
+  user_id: number;
+  product_id: number;
+  variant_id: number | null;
+  quantity: number;
+  added_at: string;
+  updated_at: string;
+  // Joined product data
+  product?: {
+    id: number;
+    name: string;
+    slug: string;
+    base_price_usd: number;
+    base_price_gbp: number;
+    sale_price_usd: number | null;
+    sale_price_gbp: number | null;
+    stock_quantity: number;
+    product_images: { url: string; alt_text: string; is_primary: boolean }[];
+  };
+  variant?: {
+    id: number;
+    label: string;
+    sku: string;
+    price_modifier_usd: number;
+    price_modifier_gbp: number;
+  };
+}
+
+// Client-side cart item (used in CartContext for both guest + logged-in)
+export interface CartLineItem {
+  productId: number;
+  variantId: number | null;
+  quantity: number;
+  name: string;
+  slug: string;
+  imageUrl: string | null;
+  sku: string;
+  variantLabel: string | null;
+  priceUsd: number;
+  priceGbp: number;
+  stockQuantity: number;
+}
+
+export interface CartReservation {
+  id: number;
+  tenant_id: number;
+  session_token: string;
+  product_id: number;
+  variant_id: number | null;
+  quantity: number;
+  reserved_until: string;
+  created_at: string;
+}
+
+export interface CheckoutSession {
+  id: number;
+  tenant_id: number;
+  user_id: number | null;
+  email: string;
+  session_token: string;
+  cart_snapshot: CartLineItem[];
+  step_reached: number;
+  abandoned_email_1_sent_at: string | null;
+  abandoned_email_2_sent_at: string | null;
+  recovered_at: string | null;
+  unsubscribed_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DiscountCode {
+  id: number;
+  tenant_id: number;
+  code: string;
+  discount_type: DiscountType;
+  value: number;
+  min_order_usd: number | null;
+  min_order_gbp: number | null;
+  max_uses: number | null;
+  uses_count: number;
+  per_customer_limit: number;
+  starts_at: string | null;
+  expires_at: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DiscountRedemption {
+  id: number;
+  tenant_id: number;
+  discount_code_id: number;
+  order_id: number | null;
+  user_id: number | null;
+  guest_email: string | null;
+  amount_saved_usd: number | null;
+  amount_saved_gbp: number | null;
+  redeemed_at: string;
+}
+
+export interface ShippingAddress {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  line1: string;
+  line2: string | null;
+  city: string;
+  county: string | null;   // UK
+  state: string | null;    // US
+  postcode: string | null; // UK
+  zipCode: string | null;  // US
+  country: string;
+}
+
+export interface Order {
+  id: number;
+  tenant_id: number;
+  order_number: string;
+  order_token: string;
+  user_id: number | null;
+  guest_email: string | null;
+  status: OrderStatus;
+  currency: string;
+  subtotal_usd: number;
+  subtotal_gbp: number;
+  shipping_cost_usd: number;
+  shipping_cost_gbp: number;
+  vat_amount_usd: number;
+  vat_amount_gbp: number;
+  discount_amount_usd: number;
+  discount_amount_gbp: number;
+  total_usd: number;
+  total_gbp: number;
+  discount_code_id: number | null;
+  shipping_method: ShippingMethod;
+  shipping_address: ShippingAddress;
+  stripe_payment_intent_id: string | null;
+  stripe_charge_id: string | null;
+  payment_method_last4: string | null;
+  payment_method_brand: string | null;
+  tracking_number: string | null;
+  tracking_carrier: string | null;
+  estimated_delivery_date: string | null;
+  refund_amount_usd: number | null;
+  refund_amount_gbp: number | null;
+  refund_reason: string | null;
+  refunded_at: string | null;
+  notes: string | null;
+  checkout_session_id: number | null;
+  created_at: string;
+  updated_at: string;
+  // Relations
+  items?: OrderItem[];
+  status_history?: OrderStatusHistory[];
+}
+
+export interface OrderItem {
+  id: number;
+  tenant_id: number;
+  order_id: number;
+  product_id: number | null;
+  variant_id: number | null;
+  quantity: number;
+  unit_price_usd: number;
+  unit_price_gbp: number;
+  total_price_usd: number;
+  total_price_gbp: number;
+  product_snapshot: {
+    name: string;
+    slug: string;
+    image_url: string | null;
+    sku: string;
+    variant_label: string | null;
+  };
+}
+
+export interface OrderStatusHistory {
+  id: number;
+  tenant_id: number;
+  order_id: number;
+  from_status: OrderStatus | null;
+  to_status: OrderStatus;
+  admin_id: number | null;
+  note: string | null;
+  metadata: Record<string, unknown> | null;
+  created_at: string;
+}
+
+// Checkout form data (used across all 3 checkout steps)
+export interface CheckoutFormData {
+  // Step 1 — Contact + Address
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  line1: string;
+  line2: string;
+  city: string;
+  county: string;   // UK
+  state: string;    // US
+  postcode: string; // UK
+  zipCode: string;  // US
+  country: string;
+  saveAddress: boolean;
+  // Step 2 — Shipping
+  shippingMethod: ShippingMethod;
+  // Step 3 — Payment
+  sameAsBilling: boolean;
+  notes: string;
+  discountCode: string;
+}
+
+// Stripe PaymentIntent response
+export interface PaymentIntentResponse {
+  clientSecret: string;
+  orderId: number;
+  orderNumber: string;
+  amount: number;
+  currency: string;
 }

@@ -18,10 +18,12 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/authContext';
+import { useCart } from '@/lib/cartContext';
 
 export function Header(): JSX.Element {
   const router = useRouter();
   const { user, logout, wishlistCount } = useAuth();
+  const { itemCount } = useCart();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
 
@@ -105,9 +107,11 @@ export function Header(): JSX.Element {
               aria-label="Shopping cart"
             >
               <ShoppingCart className="h-5 w-5" />
-              <span className="absolute -top-1 -right-1 bg-[#F4A261] text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                0
-              </span>
+              {itemCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-[#F4A261] text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {itemCount > 99 ? '99+' : itemCount}
+                </span>
+              )}
             </Link>
 
             {user ? (

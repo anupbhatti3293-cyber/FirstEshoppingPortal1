@@ -11,6 +11,8 @@ import { PriceDisplay } from './PriceDisplay';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { getCategoryName } from '@/lib/products';
+import { useCart } from '@/lib/cartContext';
+import { useToast } from '@/hooks/use-toast';
 
 interface ProductCardProps {
   product: Product;
@@ -20,8 +22,11 @@ interface ProductCardProps {
 
 export function ProductCard({ product, currency = 'USD', onQuickView }: ProductCardProps): JSX.Element {
   const router = useRouter();
+  const { addItem } = useCart();
+  const { toast } = useToast();
   const [isWishlisted, setIsWishlisted] = useState<boolean>(false);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [addingToCart, setAddingToCart] = useState(false);
   const mainImage = product.images && product.images.length > 0 ? product.images[0].url : '';
   const isOnSale = product.sale_price_usd !== null && product.sale_price_usd !== undefined;
   const isOutOfStock = product.stock_quantity <= 0 && !product.allow_backorder;
@@ -117,8 +122,25 @@ export function ProductCard({ product, currency = 'USD', onQuickView }: ProductC
     }
   }
 
-  const handleAddToCart = (e: React.MouseEvent): void => {
+  const handleAddToCart = async (e: React.MouseEvent): Promise<void> => {
     e.preventDefault();
+    if (isOutOfStock || addingToCart) return;
+    setAddingToCart(true);
+    const primaryImg = product.images?.find(i => i.is_primary)?.url ?? product.images?.[0]?.url ?? null;
+    await addItem({
+      productId: product.id,
+      variantId: null,
+      name: product.name,
+      slug: product.slug,
+      imageUrl: primaryImg,
+      sku: product.sku ?? '',
+      variantLabel: null,
+      priceUsd: product.sale_price_usd ?? product.base_price_usd,
+      priceGbp: product.sale_price_gbp ?? product.base_price_gbp,
+      stockQuantity: product.stock_quantity,
+    });
+    toast({ title: 'Added to cart', description: product.name });
+    setAddingToCart(false);
   };
 
   return (
@@ -180,11 +202,11 @@ export function ProductCard({ product, currency = 'USD', onQuickView }: ProductC
           <Button
             size="sm"
             className="w-full gap-2"
-            disabled={isOutOfStock}
+            disabled={isOutOfStock || addingToCart}
             onClick={handleAddToCart}
           >
             <ShoppingCart className="w-4 h-4" />
-            {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
+            {isOutOfStock ? 'Out of Stock' : addingToCart ? 'Adding…' : 'Add to Cart'}
           </Button>
         </div>
       </div>
