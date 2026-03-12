@@ -4,9 +4,6 @@ import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import type Stripe from 'stripe';
 import type { CartLineItem, ShippingAddress } from '@/types';
 
-// CRITICAL: Disable Next.js body parsing — Stripe needs the raw body for signature verification
-export const config = { api: { bodyParser: false } };
-
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 export async function POST(request: NextRequest) {
