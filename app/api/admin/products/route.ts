@@ -1,14 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { requireAdminRole } from '@/lib/adminGuard';
+import { getTenantIdFromRequest } from '@/lib/tenant';
 
-const TENANT_ID = 1;
-
-export async function GET(): Promise<NextResponse> {
+export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
-    const { data, error } = await supabase
+    const admin = await requireAdminRole(request, ['SUPER_ADMIN', 'ADMIN', 'MANAGER']);
+    if (!admin) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const tenantId = getTenantIdFromRequest(request) || admin.tenantId;
+
+    const { data, error } = await supabaseAdmin
       .from('products')
       .select('*, product_images(*)')
-      .eq('tenant_id', TENANT_ID)
+      .eq('tenant_id', tenantId)
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -37,6 +44,13 @@ export async function GET(): Promise<NextResponse> {
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
+    const admin = await requireAdminRole(request, ['SUPER_ADMIN', 'ADMIN', 'MANAGER']);
+    if (!admin) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const tenantId = getTenantIdFromRequest(request) || admin.tenantId;
+
     const body = await request.json();
     const {
       name,
@@ -51,10 +65,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       image_url,
     } = body;
 
-    const { data: product, error: productError } = await supabase
+    const { data: product, error: productError } = await supabaseAdmin
       .from('products')
       .insert({
-        tenant_id: TENANT_ID,
+        tenant_id: tenantId,
         name,
         slug,
         category,
@@ -81,7 +95,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     if (image_url && product) {
-      await supabase.from('product_images').insert({
+      await supabaseAdmin.from('product_images').insert({
+        tenant_id: tenantId,
         product_id: product.id,
         url: image_url,
         alt_text: name,

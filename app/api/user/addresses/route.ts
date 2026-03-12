@@ -2,11 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { cookies } from 'next/headers';
 import { getSession } from '@/lib/auth';
-
-const TENANT_ID = 1;
+import { getTenantIdFromRequest } from '@/lib/tenant';
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
+    const tenantId = getTenantIdFromRequest(request);
     const cookieStore = cookies();
     const token = cookieStore.get('auth-token')?.value;
 
@@ -30,7 +30,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       .from('user_addresses')
       .select('*')
       .eq('user_id', session.user.id)
-      .eq('tenant_id', TENANT_ID)
+      .eq('tenant_id', tenantId)
       .order('is_default', { ascending: false })
       .order('created_at', { ascending: false });
 
@@ -60,6 +60,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
+    const tenantId = getTenantIdFromRequest(request);
     const cookieStore = cookies();
     const token = cookieStore.get('auth-token')?.value;
 
@@ -106,7 +107,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const { data, error } = await supabase
       .from('user_addresses')
       .insert({
-        tenant_id: TENANT_ID,
+        tenant_id: tenantId,
         user_id: session.user.id,
         type,
         is_default: isDefault || false,

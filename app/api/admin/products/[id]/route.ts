@@ -1,20 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
-
-const TENANT_ID = 1;
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { requireAdminRole } from '@/lib/adminGuard';
+import { getTenantIdFromRequest } from '@/lib/tenant';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ): Promise<NextResponse> {
   try {
+    const admin = await requireAdminRole(request, ['SUPER_ADMIN', 'ADMIN', 'MANAGER']);
+    if (!admin) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const tenantId = getTenantIdFromRequest(request) || admin.tenantId;
     const productId = parseInt(params.id);
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('products')
       .select('*, product_images(*)')
       .eq('id', productId)
-      .eq('tenant_id', TENANT_ID)
+      .eq('tenant_id', tenantId)
       .single();
 
     if (error || !data) {
@@ -46,6 +52,12 @@ export async function PUT(
   { params }: { params: { id: string } }
 ): Promise<NextResponse> {
   try {
+    const admin = await requireAdminRole(request, ['SUPER_ADMIN', 'ADMIN', 'MANAGER']);
+    if (!admin) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const tenantId = getTenantIdFromRequest(request) || admin.tenantId;
     const productId = parseInt(params.id);
     const body = await request.json();
     const {
@@ -61,7 +73,7 @@ export async function PUT(
       image_url,
     } = body;
 
-    const { data: product, error: productError } = await supabase
+    const { data: product, error: productError } = await supabaseAdmin
       .from('products')
       .update({
         name,
@@ -76,7 +88,7 @@ export async function PUT(
         updated_at: new Date().toISOString(),
       })
       .eq('id', productId)
-      .eq('tenant_id', TENANT_ID)
+      .eq('tenant_id', tenantId)
       .select()
       .single();
 
@@ -88,19 +100,21 @@ export async function PUT(
     }
 
     if (image_url) {
-      const { data: existingImages } = await supabase
+      const { data: existingImages } = await supabaseAdmin
         .from('product_images')
         .select('id')
         .eq('product_id', productId)
+        .eq('tenant_id', tenantId)
         .eq('position', 0);
 
       if (existingImages && existingImages.length > 0) {
-        await supabase
+        await supabaseAdmin
           .from('product_images')
           .update({ url: image_url, alt_text: name })
           .eq('id', existingImages[0].id);
       } else {
-        await supabase.from('product_images').insert({
+        await supabaseAdmin.from('product_images').insert({
+          tenant_id: tenantId,
           product_id: productId,
           url: image_url,
           alt_text: name,
@@ -132,18 +146,25 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ): Promise<NextResponse> {
   try {
+    const admin = await requireAdminRole(request, ['SUPER_ADMIN', 'ADMIN', 'MANAGER']);
+    if (!admin) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const tenantId = getTenantIdFromRequest(request) || admin.tenantId;
     const productId = parseInt(params.id);
 
-    await supabase
+    await supabaseAdmin
       .from('product_images')
       .delete()
-      .eq('product_id', productId);
+      .eq('product_id', productId)
+      .eq('tenant_id', tenantId);
 
-    const { error: productError } = await supabase
+    const { error: productError } = await supabaseAdmin
       .from('products')
       .delete()
       .eq('id', productId)
-      .eq('tenant_id', TENANT_ID);
+      .eq('tenant_id', tenantId);
 
     if (productError) {
       return NextResponse.json(

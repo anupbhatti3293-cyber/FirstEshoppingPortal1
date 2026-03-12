@@ -12,14 +12,19 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { SlidersHorizontal } from 'lucide-react';
 import type { Product, ProductListResponse, Currency } from '@/types';
+import { getClientCurrency } from '@/lib/clientCookies';
 
 export default function ProductsPage(): JSX.Element {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [currency] = useState<Currency>('USD');
+  const [currency, setCurrency] = useState<Currency>('USD');
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<ProductListResponse | null>(null);
+
+  useEffect(() => {
+    setCurrency(getClientCurrency('USD'));
+  }, []);
 
   const [filters, setFilters] = useState({
     categories: searchParams.get('category') ? [searchParams.get('category')!] : [],

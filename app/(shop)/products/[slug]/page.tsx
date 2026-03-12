@@ -16,17 +16,22 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import type { Product, Currency } from '@/types';
 import { getCategoryName } from '@/lib/products';
+import { getClientCurrency } from '@/lib/clientCookies';
 
 export default function ProductDetailPage(): JSX.Element {
   const params = useParams();
   const slug = params.slug as string;
-  const [currency] = useState<Currency>('USD');
+  const [currency, setCurrency] = useState<Currency>('USD');
   const [loading, setLoading] = useState(true);
   const [product, setProduct] = useState<Product | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
+
+  useEffect(() => {
+    setCurrency(getClientCurrency('USD'));
+  }, []);
 
   useEffect(() => {
     async function fetchProduct(): Promise<void> {

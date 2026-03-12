@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { hashPassword, createToken } from '@/lib/auth';
-
-const TENANT_ID = 1;
+import { getTenantIdFromRequest } from '@/lib/tenant';
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
+    const tenantId = getTenantIdFromRequest(request);
     const body = await request.json();
     const { email, password, firstName, lastName } = body;
 
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       .from('users')
       .select('id')
       .eq('email', email.toLowerCase())
-      .eq('tenant_id', TENANT_ID)
+      .eq('tenant_id', tenantId)
       .maybeSingle();
 
     if (existingUser) {
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const { data: user, error: userError } = await supabase
       .from('users')
       .insert({
-        tenant_id: TENANT_ID,
+        tenant_id: tenantId,
         email: email.toLowerCase(),
         password_hash: passwordHash,
         first_name: firstName || null,

@@ -1,14 +1,14 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { getTenantIdFromRequest } from '@/lib/tenant';
 
-const TENANT_ID = 1;
-
-export async function GET(): Promise<NextResponse> {
+export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
+    const tenantId = getTenantIdFromRequest(request);
     const { data: products, error } = await supabase
       .from('products')
       .select('category')
-      .eq('tenant_id', TENANT_ID)
+      .eq('tenant_id', tenantId)
       .eq('is_active', true);
 
     if (error) {

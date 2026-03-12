@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Globe } from 'lucide-react';
 import {
   DropdownMenu,
@@ -9,9 +9,14 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import type { Currency } from '@/types';
+import { getClientCurrency } from '@/lib/clientCookies';
 
 export function CurrencySelector(): JSX.Element {
   const [currency, setCurrency] = useState<Currency>('USD');
+
+  useEffect(() => {
+    setCurrency(getClientCurrency('USD'));
+  }, []);
 
   const handleCurrencyChange = (newCurrency: Currency): void => {
     setCurrency(newCurrency);

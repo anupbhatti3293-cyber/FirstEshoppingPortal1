@@ -12,16 +12,21 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import type { ProductListResponse, Currency } from '@/types';
 import { getCategoryName, getCategoryDescription } from '@/lib/products';
+import { getClientCurrency } from '@/lib/clientCookies';
 
 export default function CategoryPage(): JSX.Element {
   const params = useParams();
   const searchParams = useSearchParams();
   const router = useRouter();
   const category = params.category as string;
-  const [currency] = useState<Currency>('USD');
+  const [currency, setCurrency] = useState<Currency>('USD');
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<ProductListResponse | null>(null);
+
+  useEffect(() => {
+    setCurrency(getClientCurrency('USD'));
+  }, []);
 
   const [filters, setFilters] = useState({
     categories: [category],

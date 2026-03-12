@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getProductBySlug, getRelatedProducts } from '@/lib/products';
+import { getTenantIdFromRequest } from '@/lib/tenant';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { slug: string } }
 ): Promise<NextResponse> {
   try {
-    const product = await getProductBySlug(params.slug);
+    const tenantId = getTenantIdFromRequest(request);
+    const product = await getProductBySlug(params.slug, tenantId);
 
     if (!product) {
       return NextResponse.json(
@@ -18,7 +20,7 @@ export async function GET(
       );
     }
 
-    const relatedProducts = await getRelatedProducts(product.id, product.category);
+    const relatedProducts = await getRelatedProducts(product.id, product.category, tenantId);
 
     return NextResponse.json({
       success: true,

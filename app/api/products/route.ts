@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getProducts } from '@/lib/products';
 import type { ProductFilters, Currency } from '@/types';
+import { getTenantIdFromRequest } from '@/lib/tenant';
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
     const searchParams = request.nextUrl.searchParams;
+    const tenantId = getTenantIdFromRequest(request);
 
     const filters: ProductFilters = {
       category: searchParams.get('category') || undefined,
@@ -20,7 +22,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       currency: (searchParams.get('currency') as Currency) || 'USD',
     };
 
-    const result = await getProducts(filters);
+    const result = await getProducts(filters, tenantId);
 
     return NextResponse.json({
       success: true,

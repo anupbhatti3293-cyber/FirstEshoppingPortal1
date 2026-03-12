@@ -1,9 +1,10 @@
 import { supabase } from './supabase';
 import type { Product, ProductFilters, ProductListResponse, SearchResult, Currency } from '@/types';
 
-const TENANT_ID = 1;
-
-export async function getProducts(filters: ProductFilters = {}): Promise<ProductListResponse> {
+export async function getProducts(
+  filters: ProductFilters = {},
+  tenantId: number = 1
+): Promise<ProductListResponse> {
   const {
     category,
     search,
@@ -21,7 +22,7 @@ export async function getProducts(filters: ProductFilters = {}): Promise<Product
   let query = supabase
     .from('products')
     .select('*, product_images!inner(*)', { count: 'exact' })
-    .eq('tenant_id', TENANT_ID)
+    .eq('tenant_id', tenantId)
     .eq('is_active', true);
 
   if (category) {
@@ -95,7 +96,7 @@ export async function getProducts(filters: ProductFilters = {}): Promise<Product
 
   const totalPages = Math.ceil((count || 0) / limit);
 
-  const facetsData = await getProductFacets(currency);
+  const facetsData = await getProductFacets(currency, tenantId);
 
   return {
     products: productsWithImages as Product[],
@@ -106,7 +107,10 @@ export async function getProducts(filters: ProductFilters = {}): Promise<Product
   };
 }
 
-export async function getProductBySlug(slug: string): Promise<Product | null> {
+export async function getProductBySlug(
+  slug: string,
+  tenantId: number = 1
+): Promise<Product | null> {
   const { data, error } = await supabase
     .from('products')
     .select(`
@@ -115,6 +119,7 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
       product_variants (*),
       product_reviews (*)
     `)
+    .eq('tenant_id', tenantId)
     .eq('slug', slug)
     .eq('is_active', true)
     .single();
@@ -135,7 +140,12 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
   } as Product;
 }
 
-export async function searchProducts(query: string, limit: number = 5, currency: Currency = 'USD'): Promise<SearchResult[]> {
+export async function searchProducts(
+  query: string,
+  limit: number = 5,
+  currency: Currency = 'USD',
+  tenantId: number = 1
+): Promise<SearchResult[]> {
   const { data, error } = await supabase
     .from('products')
     .select(`
@@ -147,7 +157,7 @@ export async function searchProducts(query: string, limit: number = 5, currency:
       base_price_gbp,
       product_images(url)
     `)
-    .eq('tenant_id', TENANT_ID)
+    .eq('tenant_id', tenantId)
     .eq('is_active', true)
     .or(`name.ilike.%${query}%,description.ilike.%${query}%,short_description.ilike.%${query}%,category.ilike.%${query}%`)
     .limit(limit);
@@ -168,11 +178,16 @@ export async function searchProducts(query: string, limit: number = 5, currency:
   }));
 }
 
-export async function getRelatedProducts(productId: number, category: string, limit: number = 4): Promise<Product[]> {
+export async function getRelatedProducts(
+  productId: number,
+  category: string,
+  tenantId: number = 1,
+  limit: number = 4
+): Promise<Product[]> {
   const { data, error } = await supabase
     .from('products')
     .select('*, product_images!inner(*)')
-    .eq('tenant_id', TENANT_ID)
+    .eq('tenant_id', tenantId)
     .eq('is_active', true)
     .eq('category', category)
     .neq('id', productId)
@@ -188,50 +203,33 @@ export async function getRelatedProducts(productId: number, category: string, li
   })) as Product[];
 }
 
-async function getProductFacets(currency: Currency): Promise<ProductListResponse['facets']> {
-  const { data: allProducts } = await supabase
-    .from('products')
-    .select('category, base_price_usd, base_price_gbp, tags')
-    .eq('tenant_id', TENANT_ID)
-    .eq('is_active', true);
-
-  const categories = [
-    { name: 'Jewellery', slug: 'jewellery' },
-    { name: 'Clothing', slug: 'clothing' },
-    { name: 'Purses & Bags', slug: 'purses-bags' },
-    { name: 'Beauty', slug: 'beauty' },
-  ];
-
-  const categoriesWithCount = categories.map((cat) => ({
-    ...cat,
-    count: (allProducts || []).filter((p: any) => p.category === cat.slug).length,
-  }));
-
-  const priceColumn = currency === 'USD' ? 'base_price_usd' : 'base_price_gbp';
-  const prices = (allProducts || []).map((p: any) => p[priceColumn]);
-  const minPrice = prices.length > 0 ? Math.min(...prices) : 0;
-  const maxPrice = prices.length > 0 ? Math.max(...prices) : 500;
-
-  const allTags = new Set<string>();
-  (allProducts || []).forEach((p: any) => {
-    if (p.tags && Array.isArray(p.tags)) {
-      p.tags.forEach((tag: string) => {
-        if (tag) allTags.add(tag);
-      });
-    }
+async function getProductFacets(
+  currency: Currency,
+  tenantId: number
+): Promise<ProductListResponse['facets']> {
+  const { data, error } = await supabase.rpc('get_product_facets', {
+    p_tenant_id: tenantId,
+    p_currency: currency,
   });
 
-  return {
-    categories: categoriesWithCount,
-    priceRange: { min: minPrice, max: maxPrice },
-    availableTags: Array.from(allTags),
-  };
+  if (error || !data) {
+    console.error('Error fetching facets:', error);
+    return {
+      categories: [],
+      priceRange: { min: 0, max: currency === 'GBP' ? 400 : 500 },
+      availableTags: [],
+    };
+  }
+
+  return data as ProductListResponse['facets'];
 }
 
 export async function incrementProductViews(productId: number): Promise<void> {
-  await supabase.rpc('increment', {
-    row_id: productId,
-    x: 1,
+  // Default tenant until request context is wired through caller.
+  await supabase.rpc('increment_product_view_count', {
+    p_tenant_id: 1,
+    p_product_id: productId,
+    p_increment: 1,
   });
 }
 

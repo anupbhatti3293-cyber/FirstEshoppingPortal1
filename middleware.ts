@@ -1,13 +1,17 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { getSession } from '@/lib/auth';
+import { getAdminFromRequest } from '@/lib/adminGuard';
 
 const PROTECTED_ROUTES = ['/account', '/wishlist'];
+const ADMIN_PROTECTED_PREFIX = '/admin';
+const ADMIN_LOGIN_PATH = '/admin/login';
 
 export async function middleware(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl;
 
   const isProtectedRoute = PROTECTED_ROUTES.some(route => pathname.startsWith(route));
+  const isAdminRoute = pathname.startsWith(ADMIN_PROTECTED_PREFIX) && !pathname.startsWith(ADMIN_LOGIN_PATH);
 
   if (isProtectedRoute) {
     const token = request.cookies.get('auth-token')?.value;
@@ -22,6 +26,15 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
     if (!session) {
       const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('redirect', pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
+  if (isAdminRoute) {
+    const admin = await getAdminFromRequest(request);
+    if (!admin) {
+      const loginUrl = new URL(ADMIN_LOGIN_PATH, request.url);
       loginUrl.searchParams.set('redirect', pathname);
       return NextResponse.redirect(loginUrl);
     }

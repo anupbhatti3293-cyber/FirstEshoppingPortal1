@@ -2,12 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { cookies } from 'next/headers';
 import { getSession } from '@/lib/auth';
+import { getTenantIdFromRequest } from '@/lib/tenant';
 
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ): Promise<NextResponse> {
   try {
+    const tenantId = getTenantIdFromRequest(request);
     const cookieStore = cookies();
     const token = cookieStore.get('auth-token')?.value;
 
@@ -31,7 +33,8 @@ export async function DELETE(
       .from('wishlist_items')
       .delete()
       .eq('id', params.id)
-      .eq('user_id', session.user.id);
+      .eq('user_id', session.user.id)
+      .eq('tenant_id', tenantId);
 
     if (error) {
       return NextResponse.json(

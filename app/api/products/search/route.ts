@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { searchProducts } from '@/lib/products';
 import type { Currency } from '@/types';
+import { getTenantIdFromRequest } from '@/lib/tenant';
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
@@ -8,6 +9,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const query = searchParams.get('q') || '';
     const limit = searchParams.get('limit') ? Number(searchParams.get('limit')) : 5;
     const currency = (searchParams.get('currency') as Currency) || 'USD';
+    const tenantId = getTenantIdFromRequest(request);
 
     if (!query || query.length < 2) {
       return NextResponse.json({
@@ -16,7 +18,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       });
     }
 
-    const results = await searchProducts(query, limit, currency);
+    const results = await searchProducts(query, limit, currency, tenantId);
 
     return NextResponse.json({
       success: true,

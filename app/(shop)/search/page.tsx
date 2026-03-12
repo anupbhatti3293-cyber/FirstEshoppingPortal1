@@ -6,13 +6,18 @@ import { ProductCard } from '@/components/shop/ProductCard';
 import { Breadcrumbs } from '@/components/shop/Breadcrumbs';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { Product, Currency } from '@/types';
+import { getClientCurrency } from '@/lib/clientCookies';
 
 export default function SearchPage(): JSX.Element {
   const searchParams = useSearchParams();
   const query = searchParams.get('q') || '';
-  const [currency] = useState<Currency>('USD');
+  const [currency, setCurrency] = useState<Currency>('USD');
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    setCurrency(getClientCurrency('USD'));
+  }, []);
 
   useEffect(() => {
     async function fetchResults(): Promise<void> {
