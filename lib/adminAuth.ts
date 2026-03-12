@@ -14,9 +14,11 @@ export interface AdminSession {
   expires: string;
 }
 
-const SECRET_KEY = new TextEncoder().encode(
-  process.env.ADMIN_JWT_SECRET || 'admin-dev-secret-change-in-production'
-);
+const adminJwtSecret = process.env.ADMIN_JWT_SECRET;
+if (!adminJwtSecret) {
+  throw new Error('ADMIN_JWT_SECRET environment variable is required but not set.');
+}
+const SECRET_KEY = new TextEncoder().encode(adminJwtSecret);
 
 export async function createAdminToken(session: AdminUserSession): Promise<string> {
   return new SignJWT({ admin: session })

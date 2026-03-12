@@ -70,7 +70,9 @@ export default function CategoryPage(): JSX.Element {
     fetchProducts();
   }, [category, filters, sort, page, currency]);
 
-  const updateURL = (newFilters: any, newSort?: string, newPage?: number): void => {
+  type ActiveFilters = { categories: string[]; minPrice?: number; maxPrice?: number; rating?: number; inStock: boolean; tags: string[] };
+
+  const updateURL = (newFilters: ActiveFilters, newSort?: string, newPage?: number): void => {
     const params = new URLSearchParams();
     if (newFilters.minPrice !== undefined) params.set('minPrice', newFilters.minPrice.toString());
     if (newFilters.maxPrice !== undefined) params.set('maxPrice', newFilters.maxPrice.toString());
@@ -83,7 +85,7 @@ export default function CategoryPage(): JSX.Element {
     router.push(`/products/category/${category}${params.toString() ? `?${params.toString()}` : ''}`);
   };
 
-  const handleFiltersChange = (newFilters: any): void => {
+  const handleFiltersChange = (newFilters: ActiveFilters): void => {
     setFilters({ ...newFilters, categories: [category] });
     updateURL(newFilters, sort, 1);
   };

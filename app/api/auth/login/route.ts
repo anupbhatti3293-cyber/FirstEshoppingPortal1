@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { verifyPassword, createToken } from '@/lib/auth';
 import { getTenantIdFromRequest } from '@/lib/tenant';
 
@@ -16,7 +16,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    const { data: user, error: userError } = await supabase
+    const { data: user, error: userError } = await supabaseAdmin
       .from('users')
       .select('id, email, password_hash, first_name, last_name, tenant_id, is_active')
       .eq('email', email.toLowerCase())
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    await supabase
+    await supabaseAdmin
       .from('users')
       .update({ last_login_at: new Date().toISOString() })
       .eq('id', user.id);
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
-    await supabase.from('user_sessions').insert({
+    await supabaseAdmin.from('user_sessions').insert({
       user_id: user.id,
       token,
       expires_at: expiresAt.toISOString(),

@@ -1,9 +1,11 @@
 import { SignJWT, jwtVerify } from 'jose';
 import bcrypt from 'bcryptjs';
 
-const SECRET_KEY = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'luxehaven-secret-key-change-in-production'
-);
+const jwtSecret = process.env.JWT_SECRET;
+if (!jwtSecret) {
+  throw new Error('JWT_SECRET environment variable is required but not set.');
+}
+const SECRET_KEY = new TextEncoder().encode(jwtSecret);
 
 export interface User {
   id: string;

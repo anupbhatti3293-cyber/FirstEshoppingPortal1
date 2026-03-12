@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { Globe } from 'lucide-react';
 import {
   DropdownMenu,
@@ -9,20 +8,10 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import type { Currency } from '@/types';
-import { getClientCurrency } from '@/lib/clientCookies';
+import { useCurrency } from '@/lib/currencyContext';
 
 export function CurrencySelector(): JSX.Element {
-  const [currency, setCurrency] = useState<Currency>('USD');
-
-  useEffect(() => {
-    setCurrency(getClientCurrency('USD'));
-  }, []);
-
-  const handleCurrencyChange = (newCurrency: Currency): void => {
-    setCurrency(newCurrency);
-    document.cookie = `currency=${newCurrency}; path=/; max-age=31536000`;
-    window.location.reload();
-  };
+  const { currency, setCurrency } = useCurrency();
 
   return (
     <DropdownMenu>
@@ -33,13 +22,13 @@ export function CurrencySelector(): JSX.Element {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem
-          onClick={() => handleCurrencyChange('USD')}
+          onClick={() => setCurrency('USD')}
           className="cursor-pointer"
         >
           🇺🇸 USD - United States
         </DropdownMenuItem>
         <DropdownMenuItem
-          onClick={() => handleCurrencyChange('GBP')}
+          onClick={() => setCurrency('GBP')}
           className="cursor-pointer"
         >
           🇬🇧 GBP - United Kingdom

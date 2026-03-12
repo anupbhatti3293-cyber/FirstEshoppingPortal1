@@ -2,14 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { ProductCard } from './ProductCard';
-import type { Currency, Product } from '@/types';
+import type { Product } from '@/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useCurrency } from '@/lib/currencyContext';
 
-interface TrendingProductsProps {
-  currency?: Currency;
-}
-
-export function TrendingProducts({ currency = 'USD' }: TrendingProductsProps): JSX.Element {
+export function TrendingProducts(): JSX.Element {
+  const { currency } = useCurrency();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 

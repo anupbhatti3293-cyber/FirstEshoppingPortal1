@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { cookies } from 'next/headers';
 import { getSession } from '@/lib/auth';
 import { getTenantIdFromRequest } from '@/lib/tenant';
@@ -26,7 +26,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('wishlist_items')
       .select(`
         id,
@@ -106,7 +106,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    const { data: existingItem } = await supabase
+    const { data: existingItem } = await supabaseAdmin
       .from('wishlist_items')
       .select('id')
       .eq('user_id', session.user.id)
@@ -120,7 +120,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('wishlist_items')
       .insert({
         tenant_id: tenantId,

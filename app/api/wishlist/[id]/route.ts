@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { cookies } from 'next/headers';
 import { getSession } from '@/lib/auth';
 import { getTenantIdFromRequest } from '@/lib/tenant';
@@ -29,7 +29,7 @@ export async function DELETE(
       );
     }
 
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('wishlist_items')
       .delete()
       .eq('id', params.id)

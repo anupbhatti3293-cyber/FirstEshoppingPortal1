@@ -56,7 +56,7 @@ export function ProductCard({ product, currency = 'USD', onQuickView }: ProductC
       const result = await response.json();
 
       if (result.success) {
-        const isInWishlist = result.data.some((item: any) => item.product_id === product.id);
+        const isInWishlist = result.data.some((item: { product_id: number }) => item.product_id === product.id);
         setIsWishlisted(isInWishlist);
       }
     } catch (error) {
@@ -98,7 +98,7 @@ export function ProductCard({ product, currency = 'USD', onQuickView }: ProductC
       if (isWishlisted) {
         const wishlistResponse = await fetch('/api/wishlist');
         const wishlistResult = await wishlistResponse.json();
-        const item = wishlistResult.data.find((item: any) => item.product_id === product.id);
+        const item = wishlistResult.data.find((item: { id: string; product_id: number }) => item.product_id === product.id);
 
         if (item) {
           await fetch(`/api/wishlist/${item.id}`, { method: 'DELETE' });

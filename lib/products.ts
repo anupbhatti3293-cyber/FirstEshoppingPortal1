@@ -1,5 +1,12 @@
 import { supabase } from './supabase';
-import type { Product, ProductFilters, ProductListResponse, SearchResult, Currency } from '@/types';
+import type { Product, ProductImage, ProductFilters, ProductListResponse, SearchResult, Currency } from '@/types';
+
+/** Raw DB row shape returned by Supabase when product_images is joined */
+interface ProductRow extends Omit<Product, 'images' | 'variants' | 'reviews'> {
+  product_images?: ProductImage[];
+  product_variants?: Product['variants'];
+  product_reviews?: Product['reviews'];
+}
 
 export async function getProducts(
   filters: ProductFilters = {},
@@ -86,11 +93,11 @@ export async function getProducts(
     throw new Error('Failed to fetch products');
   }
 
-  const productsWithImages = (data || []).map((product: any) => {
-    const images = product.product_images || [];
+  const productsWithImages = (data || []).map((product: ProductRow) => {
+    const images = product.product_images ?? [];
     return {
       ...product,
-      images: images.sort((a: any, b: any) => a.position - b.position),
+      images: [...images].sort((a: ProductImage, b: ProductImage) => a.position - b.position),
     };
   });
 
@@ -128,9 +135,13 @@ export async function getProductBySlug(
     return null;
   }
 
-  const images = (data.product_images || []).sort((a: any, b: any) => a.position - b.position);
-  const variants = data.product_variants || [];
-  const reviews = (data.product_reviews || []).filter((r: any) => r.is_approved);
+  const images = ([...(data.product_images ?? [])]).sort(
+    (a: ProductImage, b: ProductImage) => a.position - b.position
+  );
+  const variants = data.product_variants ?? [];
+  const reviews = (data.product_reviews ?? []).filter(
+    (r: NonNullable<Product['reviews']>[number]) => r.is_approved !== false
+  );
 
   return {
     ...data,
@@ -167,12 +178,12 @@ export async function searchProducts(
     return [];
   }
 
-  return data.map((product: any) => ({
+  return data.map((product: { id: number; name: string; slug: string; category: string; base_price_usd: number; base_price_gbp: number; product_images?: { url: string }[] }) => ({
     id: product.id,
     name: product.name,
     slug: product.slug,
     category: product.category,
-    image: product.product_images?.[0]?.url || '',
+    image: product.product_images?.[0]?.url ?? '',
     price_usd: product.base_price_usd,
     price_gbp: product.base_price_gbp,
   }));
@@ -197,9 +208,11 @@ export async function getRelatedProducts(
     return [];
   }
 
-  return data.map((product: any) => ({
+  return data.map((product: ProductRow) => ({
     ...product,
-    images: (product.product_images || []).sort((a: any, b: any) => a.position - b.position),
+    images: [...(product.product_images ?? [])].sort(
+      (a: ProductImage, b: ProductImage) => a.position - b.position
+    ),
   })) as Product[];
 }
 
@@ -224,10 +237,9 @@ async function getProductFacets(
   return data as ProductListResponse['facets'];
 }
 
-export async function incrementProductViews(productId: number): Promise<void> {
-  // Default tenant until request context is wired through caller.
+export async function incrementProductViews(productId: number, tenantId: number = 1): Promise<void> {
   await supabase.rpc('increment_product_view_count', {
-    p_tenant_id: 1,
+    p_tenant_id: tenantId,
     p_product_id: productId,
     p_increment: 1,
   });

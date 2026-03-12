@@ -2,14 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { ProductCard } from './ProductCard';
-import type { Currency, Product } from '@/types';
+import type { Product } from '@/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useCurrency } from '@/lib/currencyContext';
 
-interface NewArrivalsGridProps {
-  currency?: Currency;
-}
-
-export function NewArrivalsGrid({ currency = 'USD' }: NewArrivalsGridProps): JSX.Element {
+export function NewArrivalsGrid(): JSX.Element {
+  const { currency } = useCurrency();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 

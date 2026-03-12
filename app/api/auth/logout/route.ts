@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { cookies } from 'next/headers';
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
@@ -8,7 +8,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const token = cookieStore.get('auth-token')?.value;
 
     if (token) {
-      await supabase
+      await supabaseAdmin
         .from('user_sessions')
         .delete()
         .eq('token', token);

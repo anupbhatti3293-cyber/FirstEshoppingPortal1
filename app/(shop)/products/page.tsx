@@ -11,7 +11,7 @@ import { Breadcrumbs } from '@/components/shop/Breadcrumbs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { SlidersHorizontal } from 'lucide-react';
-import type { Product, ProductListResponse, Currency } from '@/types';
+import type { Product, ProductListResponse, Currency, ProductFilters } from '@/types';
 import { getClientCurrency } from '@/lib/clientCookies';
 
 export default function ProductsPage(): JSX.Element {
@@ -68,7 +68,9 @@ export default function ProductsPage(): JSX.Element {
     fetchProducts();
   }, [filters, sort, page, currency]);
 
-  const updateURL = (newFilters: any, newSort?: string, newPage?: number): void => {
+  type ActiveFilters = { categories: string[]; minPrice?: number; maxPrice?: number; rating?: number; inStock: boolean; tags: string[] };
+
+  const updateURL = (newFilters: ActiveFilters, newSort?: string, newPage?: number): void => {
     const params = new URLSearchParams();
     if (newFilters.categories.length > 0) params.set('category', newFilters.categories[0]);
     if (newFilters.minPrice !== undefined) params.set('minPrice', newFilters.minPrice.toString());
@@ -82,7 +84,7 @@ export default function ProductsPage(): JSX.Element {
     router.push(`/products${params.toString() ? `?${params.toString()}` : ''}`);
   };
 
-  const handleFiltersChange = (newFilters: any): void => {
+  const handleFiltersChange = (newFilters: ActiveFilters): void => {
     setFilters(newFilters);
     updateURL(newFilters, sort, 1);
   };

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getProductBySlug, getRelatedProducts } from '@/lib/products';
+import { getProductBySlug, getRelatedProducts, incrementProductViews } from '@/lib/products';
 import { getTenantIdFromRequest } from '@/lib/tenant';
 
 export async function GET(
@@ -19,6 +19,11 @@ export async function GET(
         { status: 404 }
       );
     }
+
+    // Fire-and-forget — don't await so it never delays the response
+    incrementProductViews(product.id, tenantId).catch((err) =>
+      console.error('Failed to increment view count:', err)
+    );
 
     const relatedProducts = await getRelatedProducts(product.id, product.category, tenantId);
 
@@ -41,3 +46,4 @@ export async function GET(
     );
   }
 }
+

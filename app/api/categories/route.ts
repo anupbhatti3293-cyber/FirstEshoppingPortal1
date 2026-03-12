@@ -48,7 +48,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     const categoriesWithCount = categories.map((cat) => ({
       ...cat,
-      productCount: (products || []).filter((p: any) => p.category === cat.slug).length,
+      productCount: (products || []).filter((p: { category: string }) => p.category === cat.slug).length,
     }));
 
     return NextResponse.json({

@@ -6,6 +6,7 @@ import { Footer } from '@/components/shop/Footer';
 import { AnnouncementBar } from '@/components/shop/AnnouncementBar';
 import { CookieConsent } from '@/components/shop/CookieConsent';
 import { Toaster } from '@/components/ui/toaster';
+import { CurrencyProvider } from '@/lib/currencyContext';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair' });
@@ -69,12 +70,14 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
       <body className="min-h-screen flex flex-col">
-        <AnnouncementBar messages={ANNOUNCEMENT_MESSAGES} />
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
-        <CookieConsent />
-        <Toaster />
+        <CurrencyProvider>
+          <AnnouncementBar messages={ANNOUNCEMENT_MESSAGES} />
+          <Header />
+          <main className="flex-1">{children}</main>
+          <Footer />
+          <CookieConsent />
+          <Toaster />
+        </CurrencyProvider>
       </body>
     </html>
   );

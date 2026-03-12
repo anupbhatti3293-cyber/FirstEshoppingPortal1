@@ -26,7 +26,7 @@ interface FilterSidebarProps {
     availableTags: string[];
   };
   currency: Currency;
-  onFiltersChange: (filters: any) => void;
+  onFiltersChange: (filters: FilterSidebarProps['filters']) => void;
   onClearFilters: () => void;
   className?: string;
   isMobile?: boolean;
