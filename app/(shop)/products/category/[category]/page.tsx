@@ -28,7 +28,7 @@ export default function CategoryPage(): JSX.Element {
     setCurrency(getClientCurrency('USD'));
   }, []);
 
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<ActiveFilters>({
     categories: [category],
     minPrice: searchParams.get('minPrice') ? Number(searchParams.get('minPrice')) : undefined,
     maxPrice: searchParams.get('maxPrice') ? Number(searchParams.get('maxPrice')) : undefined,

@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import type { Product, ProductImage, ProductFilters, ProductListResponse, SearchResult, Currency } from '@/types';
+import type { Product, ProductImage, ProductFilters, ProductListResponse, SearchResult, Currency, AutomationStatus } from '@/types';
 
 /** Raw DB row shape returned by Supabase when product_images is joined */
 interface ProductRow extends Omit<Product, 'images' | 'variants' | 'reviews'> {
