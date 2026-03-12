@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/authContext';
-import { User, MapPin, Heart, Package, LogOut, Loader2, Save, Trash2, Plus, X, Shield } from 'lucide-react';
+import { User, MapPin, Heart, Package, LogOut, Loader as Loader2, Save, Trash2, Plus, X, Shield } from 'lucide-react';
 
 type Tab = 'profile' | 'addresses' | 'wishlist';
 

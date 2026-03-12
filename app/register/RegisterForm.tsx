@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/authContext';
-import { Eye, EyeOff, ArrowRight, Loader2, Check } from 'lucide-react';
+import { Eye, EyeOff, ArrowRight, Loader as Loader2, Check } from 'lucide-react';
 
 export function RegisterForm() {
   const router = useRouter();

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/lib/authContext';
 import { useCurrency } from '@/lib/currencyContext';
-import { Heart, Trash2, Loader2, ArrowRight, ShoppingBag } from 'lucide-react';
+import { Heart, Trash2, Loader as Loader2, ArrowRight, ShoppingBag } from 'lucide-react';
 import { PriceDisplay } from '@/components/shop/PriceDisplay';
 
 interface WishlistItem {
