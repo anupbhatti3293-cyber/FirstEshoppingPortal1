@@ -39,6 +39,8 @@ interface CartContextType {
   applyDiscount: () => Promise<void>;
   removeDiscount: () => void;
   mergeGuestCart: () => Promise<void>;
+  /** Restore cart items from an abandoned-cart recovery snapshot */
+  setItemsFromRecovery: (snapshot: CartLineItem[]) => void;
 }
 
 const CartContext = createContext<CartContextType | null>(null);
@@ -85,7 +87,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const loadCart = useCallback(async () => {
     setLoading(true);
     if (user) {
-      // Logged in — fetch from DB
       try {
         const res = await fetch('/api/cart');
         if (res.ok) {
@@ -94,7 +95,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
         }
       } catch { /* keep existing items */ }
     } else {
-      // Guest — read from localStorage
       setItems(readGuestCart());
     }
     setLoading(false);
@@ -199,6 +199,23 @@ export function CartProvider({ children }: { children: ReactNode }) {
     await loadCart();
   }, [loadCart]);
 
+  // ── Restore from abandoned-cart recovery snapshot ───────────────────────────
+
+  const setItemsFromRecovery = useCallback((snapshot: CartLineItem[]) => {
+    if (user) {
+      // Logged-in: persist snapshot to DB via cart merge endpoint
+      fetch('/api/cart/merge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: snapshot }),
+      }).then(() => loadCart()).catch(console.error);
+    } else {
+      // Guest: write to localStorage
+      writeGuestCart(snapshot);
+      setItems(snapshot);
+    }
+  }, [user, loadCart]);
+
   // ── Discount code ───────────────────────────────────────────────────────────
 
   const applyDiscount = useCallback(async () => {
@@ -247,6 +264,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       applyDiscount,
       removeDiscount,
       mergeGuestCart,
+      setItemsFromRecovery,
     }}>
       {children}
     </CartContext.Provider>

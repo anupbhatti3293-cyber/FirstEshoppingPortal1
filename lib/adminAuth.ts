@@ -1,4 +1,5 @@
 import { SignJWT, jwtVerify } from 'jose';
+import type { NextRequest } from 'next/server';
 
 export type AdminRole = 'SUPER_ADMIN' | 'ADMIN' | 'MANAGER';
 
@@ -37,3 +38,25 @@ export async function verifyAdminToken(token: string): Promise<AdminSession | nu
   }
 }
 
+/**
+ * requireAdminRole
+ * Used by all /api/admin/* routes in Feature 4B.
+ * Reads the admin-token cookie, verifies it, and returns
+ * { success, adminId, role, tenantId } or { success: false }.
+ */
+export async function requireAdminRole(
+  request: NextRequest
+): Promise<{ success: boolean; adminId?: number; role?: AdminRole; tenantId?: number }> {
+  const token = request.cookies.get('admin-token')?.value;
+  if (!token) return { success: false };
+
+  const session = await verifyAdminToken(token);
+  if (!session?.admin) return { success: false };
+
+  return {
+    success: true,
+    adminId: session.admin.id,
+    role: session.admin.role,
+    tenantId: session.admin.tenantId,
+  };
+}
