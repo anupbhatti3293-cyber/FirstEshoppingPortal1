@@ -1,14 +1,29 @@
 import { Resend } from 'resend';
 import type { CartLineItem, Order } from '@/types';
 
-if (!process.env.RESEND_API_KEY) {
-  throw new Error('RESEND_API_KEY environment variable is required');
-}
-
-export const resend = new Resend(process.env.RESEND_API_KEY);
-
 const FROM = process.env.RESEND_FROM_EMAIL || 'orders@luxehaven.com';
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://luxehaven.com';
+
+// Lazy-initialise Resend so a placeholder API key doesn't crash the app at startup.
+// The client is created on first use — if the key is missing/placeholder we log a
+// warning and return a no-op result instead of throwing.
+let _resend: Resend | null = null;
+function getResend(): Resend | null {
+  if (_resend) return _resend;
+  const key = process.env.RESEND_API_KEY;
+  if (!key || key.startsWith('re_placeholder') || key === 'your_resend_key') {
+    console.warn('[Resend] RESEND_API_KEY is not configured — emails will not be sent.');
+    return null;
+  }
+  _resend = new Resend(key);
+  return _resend;
+}
+
+export const resend = { emails: { send: async (opts: Parameters<Resend['emails']['send']>[0]) => {
+  const client = getResend();
+  if (!client) return { id: 'no-op', error: null };
+  return client.emails.send(opts);
+}}};
 
 // ─── Shared brand styles ───────────────────────────────────────────────────
 const brandStyles = `

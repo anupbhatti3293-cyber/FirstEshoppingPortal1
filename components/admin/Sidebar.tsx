@@ -15,18 +15,22 @@ import {
   LogOut,
   Menu,
   X,
+  Tag,
+  ShoppingBag,
 } from 'lucide-react';
 import { useState } from 'react';
 
 const NAV_ITEMS = [
-  { href: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { href: '/admin/products', icon: Package, label: 'Products' },
-  { href: '/admin/orders', icon: ShoppingCart, label: 'Orders' },
-  { href: '/admin/customers', icon: Users, label: 'Customers' },
-  { href: '/admin/suppliers', icon: Truck, label: 'Suppliers' },
-  { href: '/admin/stylemate', icon: Sparkles, label: 'StyleMate AI' },
-  { href: '/admin/analytics', icon: BarChart3, label: 'Analytics' },
-  { href: '/admin/settings', icon: Settings, label: 'Settings' },
+  { href: '/admin/dashboard',       icon: LayoutDashboard, label: 'Dashboard' },
+  { href: '/admin/products',        icon: Package,         label: 'Products' },
+  { href: '/admin/orders',          icon: ShoppingCart,    label: 'Orders' },
+  { href: '/admin/discounts',       icon: Tag,             label: 'Discounts' },
+  { href: '/admin/abandoned-carts', icon: ShoppingBag,     label: 'Abandoned Carts' },
+  { href: '/admin/customers',       icon: Users,           label: 'Customers' },
+  { href: '/admin/suppliers',       icon: Truck,           label: 'Suppliers' },
+  { href: '/admin/stylemate',       icon: Sparkles,        label: 'StyleMate AI' },
+  { href: '/admin/analytics',       icon: BarChart3,       label: 'Analytics' },
+  { href: '/admin/settings',        icon: Settings,        label: 'Settings' },
 ];
 
 export function Sidebar(): JSX.Element {
@@ -88,9 +92,7 @@ export function Sidebar(): JSX.Element {
 
         <div className="p-4 border-t border-white/10">
           <button
-            onClick={() => {
-              window.location.href = '/admin/login';
-            }}
+            onClick={() => { window.location.href = '/admin/login'; }}
             className="flex items-center gap-3 px-4 py-3 rounded-lg text-white/80 hover:bg-white/10 hover:text-white transition-colors w-full"
           >
             <LogOut className="h-5 w-5 flex-shrink-0" />

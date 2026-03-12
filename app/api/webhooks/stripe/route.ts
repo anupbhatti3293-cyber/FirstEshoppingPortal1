@@ -12,7 +12,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 500 });
   }
 
-  // Get raw body for Stripe signature verification
   const body = await request.text();
   const signature = request.headers.get('stripe-signature');
 
@@ -28,14 +27,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
-  // Only handle payment_intent.succeeded for now
   if (event.type === 'payment_intent.succeeded') {
     const paymentIntent = event.data.object as Stripe.PaymentIntent;
     await handlePaymentSuccess(paymentIntent);
   }
 
-  // Always return 200 to Stripe — never let webhook errors cause retries for unhandled events
   return NextResponse.json({ received: true });
+}
+
+/** Generate order number inline — LH-YYYYMMDD-XXXXX — no DB function required */
+function generateOrderNumber(): string {
+  const now = new Date();
+  const date = now.toISOString().slice(0, 10).replace(/-/g, '');
+  const rand = Math.floor(Math.random() * 90000) + 10000;
+  return `LH-${date}-${rand}`;
 }
 
 async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
@@ -47,7 +52,7 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
   const checkoutSessionId = meta.checkoutSessionId ? parseInt(meta.checkoutSessionId) : null;
   const currency = meta.currency || 'USD';
 
-  // ── IDEMPOTENCY CHECK — prevent duplicate orders from webhook retries ──
+  // ── IDEMPOTENCY CHECK ──
   const { data: existingOrder } = await supabaseAdmin
     .from('orders')
     .select('id, order_number')
@@ -56,13 +61,10 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
 
   if (existingOrder) {
     console.log(`Order already exists for PaymentIntent ${paymentIntent.id}: ${existingOrder.order_number}`);
-    return; // Already processed — idempotent
+    return;
   }
 
-  // ── Generate order number ──
-  const { data: orderNumberData } = await supabaseAdmin
-    .rpc('generate_order_number', { p_tenant_id: tenantId });
-  const orderNumber = orderNumberData || `LH-${Date.now()}`;
+  const orderNumber = generateOrderNumber();
 
   // ── Get shipping address from checkout session ──
   let shippingAddress: ShippingAddress = {
@@ -80,7 +82,6 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
       .maybeSingle();
 
     if (checkoutSession) {
-      // Get shipping address stored in payment intent
       const piShippingAddress = paymentIntent.shipping;
       if (piShippingAddress?.address) {
         shippingAddress = {
@@ -107,7 +108,6 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
     cartItems = JSON.parse(meta.cartSnapshot || '[]');
   } catch { cartItems = []; }
 
-  // ── Get full cart if snapshot is truncated (Stripe 500 char limit) ──
   if (cartItems.length === 0 && userId) {
     const { data: dbCart } = await supabaseAdmin
       .from('cart_items')
@@ -124,7 +124,7 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
     }
   }
 
-  // ── Get product details for order_items snapshot ──
+  // ── Get product details ──
   const productIds = cartItems.map(i => i.productId).filter(Boolean);
   const { data: products } = productIds.length > 0
     ? await supabaseAdmin
@@ -228,7 +228,6 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
 
   // ── Increment discount code usage ──
   if (discountCodeId) {
-    // Increment discount usage count directly
     const { data: currentDiscount } = await supabaseAdmin
       .from('discount_codes')
       .select('uses_count')
@@ -240,7 +239,6 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
         .update({ uses_count: currentDiscount.uses_count + 1 })
         .eq('id', discountCodeId);
     }
-
     await supabaseAdmin.from('discount_redemptions').insert({
       tenant_id: tenantId,
       discount_code_id: discountCodeId,
@@ -262,7 +260,7 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
       .eq('id', checkoutSessionId);
   }
 
-  // ── Auto-fulfilment signal to supplier (if configured) ──
+  // ── Auto-fulfilment signal to supplier ──
   try {
     const { data: supplierIntegration } = await supabaseAdmin
       .from('supplier_integrations')
@@ -272,23 +270,17 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
       .maybeSingle();
 
     if (supplierIntegration?.base_url) {
-      // Validate URL is https before calling (prevent SSRF)
       const supplierUrl = new URL(supplierIntegration.base_url);
       if (supplierUrl.protocol === 'https:') {
         await fetch(`${supplierIntegration.base_url}/orders`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            orderNumber: order.order_number,
-            orderId: order.id,
-            items: cartItems,
-            shippingAddress,
-          }),
-          signal: AbortSignal.timeout(5000), // 5s timeout
+          body: JSON.stringify({ orderNumber: order.order_number, orderId: order.id, items: cartItems, shippingAddress }),
+          signal: AbortSignal.timeout(5000),
         }).catch(err => console.warn('Supplier fulfilment signal failed:', err));
       }
     }
-  } catch { /* non-critical — don't let this fail the webhook */ }
+  } catch { /* non-critical */ }
 
   console.log(`✅ Order created: ${order.order_number} (PI: ${paymentIntent.id})`);
 }
