@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
-import { Search, Heart, ShoppingCart, User, Menu, X, LogOut } from 'lucide-react';
+import { Search, Heart, ShoppingCart, User, Menu, LogOut } from 'lucide-react';
 import { CurrencySelector } from './CurrencySelector';
 import { MobileMenu } from './MobileMenu';
 import { SearchBar } from './SearchBar';
@@ -17,60 +17,18 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useRouter } from 'next/navigation';
-
-interface UserData {
-  id: string;
-  email: string;
-  firstName: string | null;
-  lastName: string | null;
-}
+import { useAuth } from '@/lib/authContext';
 
 export function Header(): JSX.Element {
   const router = useRouter();
+  const { user, logout, wishlistCount } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
-  const [user, setUser] = useState<UserData | null>(null);
-  const [wishlistCount, setWishlistCount] = useState<number>(0);
-
-  useEffect(() => {
-    fetchUser();
-    fetchWishlistCount();
-  }, []);
-
-  async function fetchUser(): Promise<void> {
-    try {
-      const response = await fetch('/api/auth/me');
-      const result = await response.json();
-      if (result.success) {
-        setUser(result.data.user);
-      }
-    } catch (error) {
-      // User not logged in
-    }
-  }
-
-  async function fetchWishlistCount(): Promise<void> {
-    try {
-      const response = await fetch('/api/wishlist');
-      const result = await response.json();
-      if (result.success) {
-        setWishlistCount(result.data.length);
-      }
-    } catch (error) {
-      // Failed to fetch wishlist
-    }
-  }
 
   async function handleLogout(): Promise<void> {
-    try {
-      await fetch('/api/auth/logout', { method: 'POST' });
-      setUser(null);
-      setWishlistCount(0);
-      router.push('/');
-      router.refresh();
-    } catch (error) {
-      console.error('Logout failed:', error);
-    }
+    await logout();
+    router.push('/');
+    router.refresh();
   }
 
   function getInitials(): string {

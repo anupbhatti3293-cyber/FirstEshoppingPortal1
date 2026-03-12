@@ -1,156 +1,69 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
-import { cookies } from 'next/headers';
 import { getSession } from '@/lib/auth';
-import { getTenantIdFromRequest } from '@/lib/tenant';
 
-export async function GET(request: NextRequest): Promise<NextResponse> {
-  try {
-    const tenantId = getTenantIdFromRequest(request);
-    const cookieStore = cookies();
-    const token = cookieStore.get('auth-token')?.value;
+// GET — fetch wishlist for current user
+export async function GET(request: NextRequest) {
+  const token = request.cookies.get('auth-token')?.value;
+  const session = await getSession(token);
+  if (!session) return NextResponse.json({ success: false, error: 'Unauthorised' }, { status: 401 });
 
-    if (!token) {
-      return NextResponse.json(
-        { success: false, error: 'Not authenticated' },
-        { status: 401 }
-      );
-    }
+  const { data, error } = await supabaseAdmin
+    .from('wishlist_items')
+    .select(`
+      id,
+      product_id,
+      added_at,
+      products (
+        id, name, slug, base_price_usd, base_price_gbp,
+        sale_price_usd, sale_price_gbp,
+        rating_average, rating_count, stock_quantity,
+        product_images (url, alt_text, is_primary, position)
+      )
+    `)
+    .eq('user_id', session.user.id)
+    .order('added_at', { ascending: false });
 
-    const session = await getSession(token);
-
-    if (!session) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid session' },
-        { status: 401 }
-      );
-    }
-
-    const { data, error } = await supabaseAdmin
-      .from('wishlist_items')
-      .select(`
-        id,
-        product_id,
-        added_at,
-        notes,
-        products (
-          id,
-          name,
-          slug,
-          short_description,
-          category,
-          base_price_usd,
-          base_price_gbp,
-          stock_quantity,
-          is_active,
-          product_images (url, alt_text)
-        )
-      `)
-      .eq('user_id', session.user.id)
-      .eq('tenant_id', tenantId)
-      .order('added_at', { ascending: false });
-
-    if (error) {
-      return NextResponse.json(
-        { success: false, error: 'Failed to fetch wishlist' },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({
-      success: true,
-      data: data || [],
-    });
-  } catch (error) {
-    console.error('Wishlist fetch error:', error);
-    return NextResponse.json(
-      {
-        success: false,
-        error: 'Failed to fetch wishlist',
-        message: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 500 }
-    );
-  }
+  if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  return NextResponse.json({ success: true, data });
 }
 
-export async function POST(request: NextRequest): Promise<NextResponse> {
-  try {
-    const tenantId = getTenantIdFromRequest(request);
-    const cookieStore = cookies();
-    const token = cookieStore.get('auth-token')?.value;
+// POST — add product to wishlist
+export async function POST(request: NextRequest) {
+  const token = request.cookies.get('auth-token')?.value;
+  const session = await getSession(token);
+  if (!session) return NextResponse.json({ success: false, error: 'Unauthorised' }, { status: 401 });
 
-    if (!token) {
-      return NextResponse.json(
-        { success: false, error: 'Not authenticated' },
-        { status: 401 }
-      );
-    }
+  const { productId } = await request.json();
+  if (!productId) return NextResponse.json({ success: false, error: 'productId required' }, { status: 400 });
 
-    const session = await getSession(token);
+  const { data, error } = await supabaseAdmin
+    .from('wishlist_items')
+    .upsert({ user_id: session.user.id, product_id: productId, tenant_id: session.user.tenantId },
+      { onConflict: 'user_id,product_id' })
+    .select()
+    .single();
 
-    if (!session) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid session' },
-        { status: 401 }
-      );
-    }
+  if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  return NextResponse.json({ success: true, data });
+}
 
-    const body = await request.json();
-    const { productId } = body;
+// DELETE — remove product from wishlist
+export async function DELETE(request: NextRequest) {
+  const token = request.cookies.get('auth-token')?.value;
+  const session = await getSession(token);
+  if (!session) return NextResponse.json({ success: false, error: 'Unauthorised' }, { status: 401 });
 
-    if (!productId) {
-      return NextResponse.json(
-        { success: false, error: 'Product ID is required' },
-        { status: 400 }
-      );
-    }
+  const { searchParams } = new URL(request.url);
+  const productId = searchParams.get('productId');
+  if (!productId) return NextResponse.json({ success: false, error: 'productId required' }, { status: 400 });
 
-    const { data: existingItem } = await supabaseAdmin
-      .from('wishlist_items')
-      .select('id')
-      .eq('user_id', session.user.id)
-      .eq('product_id', productId)
-      .maybeSingle();
+  const { error } = await supabaseAdmin
+    .from('wishlist_items')
+    .delete()
+    .eq('user_id', session.user.id)
+    .eq('product_id', productId);
 
-    if (existingItem) {
-      return NextResponse.json(
-        { success: false, error: 'Product already in wishlist' },
-        { status: 400 }
-      );
-    }
-
-    const { data, error } = await supabaseAdmin
-      .from('wishlist_items')
-      .insert({
-        tenant_id: tenantId,
-        user_id: session.user.id,
-        product_id: productId,
-      })
-      .select()
-      .single();
-
-    if (error) {
-      return NextResponse.json(
-        { success: false, error: 'Failed to add to wishlist' },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({
-      success: true,
-      data,
-      message: 'Added to wishlist',
-    });
-  } catch (error) {
-    console.error('Wishlist add error:', error);
-    return NextResponse.json(
-      {
-        success: false,
-        error: 'Failed to add to wishlist',
-        message: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 500 }
-    );
-  }
+  if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  return NextResponse.json({ success: true });
 }
