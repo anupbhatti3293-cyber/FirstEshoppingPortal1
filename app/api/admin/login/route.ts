@@ -4,10 +4,10 @@ import bcrypt from 'bcryptjs';
 import { SignJWT } from 'jose';
 import { checkRateLimit, recordFailedAttempt, clearAttempts } from '@/lib/rateLimit';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder-key';
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 export async function POST(request: NextRequest) {
   try {
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
       .eq('id', admin.id);
 
     // Sign JWT
-    const secret = new TextEncoder().encode(process.env.ADMIN_JWT_SECRET!);
+    const secret = new TextEncoder().encode(process.env.ADMIN_JWT_SECRET! || 'placeholder-secret');
     const token = await new SignJWT({
       adminId: admin.id,
       email: admin.email,
