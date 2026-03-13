@@ -1,13 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function AdminLoginPage(): JSX.Element {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
@@ -19,10 +20,23 @@ export default function AdminLoginPage(): JSX.Element {
     setIsLoading(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      router.push('/admin/dashboard');
+      const res = await fetch('/api/admin/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        setError(data.error || 'Invalid email or password');
+        return;
+      }
+
+      const redirect = searchParams.get('redirect') || '/admin/dashboard';
+      router.push(redirect);
     } catch (err) {
-      setError('Invalid email or password');
+      setError('Login failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
