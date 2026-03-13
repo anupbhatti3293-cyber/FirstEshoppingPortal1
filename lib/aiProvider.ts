@@ -1,28 +1,27 @@
 // ============================================================
 // LuxeHaven AI Provider System
 // ============================================================
-// Plugin-based architecture — add any new AI provider in ~20 lines.
-// To add a new provider (e.g. ChatGPT, Mistral, Cohere):
-//   1. Add a new case in the PROVIDERS map below
-//   2. Add the env key to .env.example
-//   3. It will automatically appear in Admin → Settings
+// Plugin-based architecture — add any new AI in ~20 lines.
+// Gemini uses the official @google/genai SDK (auto-handles
+// API versioning, retries, model updates).
 // ============================================================
+
+import { GoogleGenAI } from '@google/genai';
 
 export type AIProvider = 'claude' | 'gemini' | 'openai';
 
 export interface ProviderMeta {
   id: AIProvider;
-  name: string;          // Display name
-  company: string;       // Company name
-  model: string;         // Exact model string used in API calls
-  envKey: string;        // Env variable name for the API key
-  costPerProduct: string;// Rough cost estimate for display
-  description: string;   // Short description for Settings UI
-  icon: string;          // Emoji icon
+  name: string;
+  company: string;
+  model: string;
+  envKey: string;
+  costPerProduct: string;
+  description: string;
+  icon: string;
 }
 
-// ── Provider registry ────────────────────────────────────────
-// Add new providers here — everything else is automatic
+// ── Provider registry ───────────────────────────────────────────────
 export const PROVIDERS: Record<AIProvider, ProviderMeta> = {
   claude: {
     id: 'claude',
@@ -56,7 +55,6 @@ export const PROVIDERS: Record<AIProvider, ProviderMeta> = {
   },
 };
 
-// ── Active provider resolution ────────────────────────────────
 export function getActiveProvider(): AIProvider {
   const p = process.env.AI_PROVIDER ?? 'gemini';
   if (p in PROVIDERS) return p as AIProvider;
@@ -68,11 +66,10 @@ export function getProviderMeta(provider?: AIProvider): ProviderMeta {
 }
 
 export function hasKeyConfigured(provider: AIProvider): boolean {
-  const envKey = PROVIDERS[provider].envKey;
-  return !!process.env[envKey];
+  return !!process.env[PROVIDERS[provider].envKey];
 }
 
-// ── Claude (Anthropic) ────────────────────────────────────────
+// ── Claude (Anthropic) ─────────────────────────────────────────
 async function callClaude(system: string, user: string, maxTokens: number): Promise<string> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error('ANTHROPIC_API_KEY is not set in .env.local');
@@ -109,37 +106,33 @@ async function callClaude(system: string, user: string, maxTokens: number): Prom
   throw new Error('Claude failed after 3 attempts');
 }
 
-// ── Gemini (Google) ───────────────────────────────────────────
-// Uses stable v1 API (not v1beta) with gemini-2.5-flash
+// ── Gemini (Google) — uses official @google/genai SDK ──────────────
 async function callGemini(system: string, user: string, maxTokens: number): Promise<string> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error('GEMINI_API_KEY is not set in .env.local');
 
-  const model = PROVIDERS.gemini.model; // gemini-2.5-flash
-  const url = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${apiKey}`;
-
   for (let attempt = 1; attempt <= 3; attempt++) {
     try {
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          system_instruction: { parts: [{ text: system }] },
-          contents: [{ role: 'user', parts: [{ text: user }] }],
-          generationConfig: { maxOutputTokens: maxTokens, temperature: 0.7 },
-        }),
+      const ai = new GoogleGenAI({ apiKey });
+      const response = await ai.models.generateContent({
+        model: PROVIDERS.gemini.model,
+        contents: user,
+        config: {
+          systemInstruction: system,
+          maxOutputTokens: maxTokens,
+          temperature: 0.7,
+        },
       });
-      if (res.status === 503 || res.status === 429) {
-        if (attempt < 3) { await sleep(attempt * 10000); continue; }
-      }
-      if (!res.ok) throw new Error(`Gemini API ${res.status}: ${await res.text()}`);
-      const data = await res.json() as {
-        candidates: Array<{ content: { parts: Array<{ text: string }> } }>;
-      };
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      const text = response.text;
       if (!text) throw new Error('No text in Gemini response');
       return text;
     } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      // Retry on quota/overload errors
+      if ((msg.includes('429') || msg.includes('503')) && attempt < 3) {
+        await sleep(attempt * 10000);
+        continue;
+      }
       if (attempt === 3) throw err;
       await sleep(attempt * 5000);
     }
@@ -173,9 +166,7 @@ async function callOpenAI(system: string, user: string, maxTokens: number): Prom
         if (attempt < 3) { await sleep(attempt * 10000); continue; }
       }
       if (!res.ok) throw new Error(`OpenAI API ${res.status}: ${await res.text()}`);
-      const data = await res.json() as {
-        choices: Array<{ message: { content: string } }>;
-      };
+      const data = await res.json() as { choices: Array<{ message: { content: string } }> };
       const text = data.choices?.[0]?.message?.content;
       if (!text) throw new Error('No text in OpenAI response');
       return text;
