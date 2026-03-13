@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Loader2, Sparkles, CheckCircle, XCircle, Clock, RefreshCw, Upload } from 'lucide-react';
+import { Loader2, Sparkles, RefreshCw, Upload } from 'lucide-react';
+import type { AIProvider } from '@/lib/aiProvider';
 
 interface Product {
   id: number;
@@ -36,15 +37,13 @@ interface AIResult {
 
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, { label: string; colour: string }> = {
-    not_run:    { label: 'Not Run',    colour: 'bg-gray-100 text-gray-600' },
+    not_run:    { label: 'Not Run',   colour: 'bg-gray-100 text-gray-600' },
     processing: { label: 'Running…',  colour: 'bg-blue-100 text-blue-700' },
-    completed:  { label: 'Done',       colour: 'bg-green-100 text-green-700' },
-    failed:     { label: 'Failed',     colour: 'bg-red-100 text-red-700' },
+    completed:  { label: 'Done',      colour: 'bg-green-100 text-green-700' },
+    failed:     { label: 'Failed',    colour: 'bg-red-100 text-red-700' },
   };
   const s = map[status] ?? map['not_run'];
-  return (
-    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${s.colour}`}>{s.label}</span>
-  );
+  return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${s.colour}`}>{s.label}</span>;
 }
 
 function QualityBar({ score }: { score: number | null }) {
@@ -71,11 +70,23 @@ export default function StyleMatePage() {
   const [locale, setLocale] = useState<'us' | 'uk'>('us');
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
   const [publishing, setPublishing] = useState(false);
+  const [activeProvider, setActiveProvider] = useState<string>('AI');
 
   const showToast = (msg: string, type: 'success' | 'error') => {
     setToast({ msg, type });
     setTimeout(() => setToast(null), 4000);
   };
+
+  // Fetch active provider name for display
+  useEffect(() => {
+    fetch('/api/admin/settings/ai-provider')
+      .then((r) => r.json())
+      .then((d: { provider: AIProvider; providers: Array<{ id: string; name: string }> }) => {
+        const meta = d.providers?.find((p) => p.id === d.provider);
+        if (meta) setActiveProvider(meta.name);
+      })
+      .catch(() => {});
+  }, []);
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -97,7 +108,6 @@ export default function StyleMatePage() {
     setRunningIds((prev) => new Set(prev).add(product.id));
     setSelectedProduct(product);
     setAiResult(null);
-
     try {
       const res = await fetch('/api/admin/stylemate/analyse', {
         method: 'POST',
@@ -105,13 +115,9 @@ export default function StyleMatePage() {
         body: JSON.stringify({ productId: product.id }),
       });
       const data = await res.json() as { result?: AIResult; error?: string };
-
-      if (!res.ok || !data.result) {
-        throw new Error(data.error ?? 'AI analysis failed');
-      }
-
+      if (!res.ok || !data.result) throw new Error(data.error ?? 'AI analysis failed');
       setAiResult(data.result);
-      showToast(`StyleMate AI complete for "${product.name}"`, 'success');
+      showToast(`Analysis complete for "${product.name}"`, 'success');
       fetchProducts();
     } catch (err) {
       showToast(err instanceof Error ? err.message : 'AI analysis failed', 'error');
@@ -146,7 +152,6 @@ export default function StyleMatePage() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      {/* Toast */}
       {toast && (
         <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-white text-sm font-medium ${
           toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'
@@ -155,22 +160,26 @@ export default function StyleMatePage() {
         </div>
       )}
 
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-[#1E3A5F]" style={{ fontFamily: 'Playfair Display, serif' }}>
-          StyleMate AI
-        </h1>
-        <p className="text-gray-500 mt-1">AI-powered product optimisation — titles, descriptions, SEO &amp; quality scores</p>
+      <div className="mb-6 flex items-end justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-[#1E3A5F]" style={{ fontFamily: 'Playfair Display, serif' }}>
+            StyleMate AI
+          </h1>
+          <p className="text-gray-500 mt-1">
+            Powered by <span className="font-medium text-[#2E86AB]">{activeProvider}</span>
+            {' '}— <a href="/admin/settings" className="underline text-gray-400 hover:text-gray-600 text-sm">switch provider</a>
+          </p>
+        </div>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
         {[
           { label: 'Total Products', value: stats?.total ?? '—' },
-          { label: 'Analysed', value: stats?.analysed ?? '—' },
-          { label: 'Pending', value: stats?.pending ?? '—' },
-          { label: 'Failed', value: stats?.failed ?? '—' },
-          { label: 'Avg Quality', value: stats?.avgQualityScore !== null && stats?.avgQualityScore !== undefined ? `${stats.avgQualityScore}/100` : '—' },
+          { label: 'Analysed',       value: stats?.analysed ?? '—' },
+          { label: 'Pending',        value: stats?.pending ?? '—' },
+          { label: 'Failed',         value: stats?.failed ?? '—' },
+          { label: 'Avg Quality',    value: stats?.avgQualityScore !== null && stats?.avgQualityScore !== undefined ? `${stats.avgQualityScore}/100` : '—' },
         ].map((s) => (
           <div key={s.label} className="bg-white rounded-xl border border-gray-200 p-4">
             <p className="text-gray-500 text-xs">{s.label}</p>
@@ -182,18 +191,12 @@ export default function StyleMatePage() {
       <div className="flex gap-6">
         {/* Product list */}
         <div className="flex-1 min-w-0">
-          {/* Filters */}
           <div className="flex gap-2 mb-4">
             {(['all', 'pending', 'completed', 'failed'] as const).map((f) => (
-              <button
-                key={f}
-                onClick={() => setFilter(f)}
+              <button key={f} onClick={() => setFilter(f)}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium capitalize transition-colors ${
-                  filter === f
-                    ? 'bg-[#1E3A5F] text-white'
-                    : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
-                }`}
-              >
+                  filter === f ? 'bg-[#1E3A5F] text-white' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
+                }`}>
                 {f}
               </button>
             ))}
@@ -202,7 +205,6 @@ export default function StyleMatePage() {
             </button>
           </div>
 
-          {/* Table */}
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
             {loading ? (
               <div className="flex justify-center items-center py-16">
@@ -226,13 +228,11 @@ export default function StyleMatePage() {
                 </thead>
                 <tbody>
                   {products.map((p) => (
-                    <tr
-                      key={p.id}
+                    <tr key={p.id}
                       onClick={() => { setSelectedProduct(p); setAiResult(null); }}
                       className={`border-b border-gray-50 cursor-pointer hover:bg-blue-50 transition-colors ${
                         selectedProduct?.id === p.id ? 'bg-blue-50' : ''
-                      }`}
-                    >
+                      }`}>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
                           {p.image && (
@@ -251,11 +251,9 @@ export default function StyleMatePage() {
                           disabled={runningIds.has(p.id)}
                           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#2E86AB] text-white text-xs font-medium hover:bg-[#1E6A8A] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                         >
-                          {runningIds.has(p.id) ? (
-                            <><Loader2 size={12} className="animate-spin" /> Running</>
-                          ) : (
-                            <><Sparkles size={12} /> Run AI</>
-                          )}
+                          {runningIds.has(p.id)
+                            ? <><Loader2 size={12} className="animate-spin" /> Running</>
+                            : <><Sparkles size={12} /> Run AI</>}
                         </button>
                       </td>
                     </tr>
@@ -274,15 +272,10 @@ export default function StyleMatePage() {
                 <h2 className="font-semibold text-[#1E3A5F] text-sm line-clamp-1">{selectedProduct.name}</h2>
                 <div className="flex gap-1">
                   {(['us', 'uk'] as const).map((l) => (
-                    <button
-                      key={l}
-                      onClick={() => setLocale(l)}
+                    <button key={l} onClick={() => setLocale(l)}
                       className={`px-2 py-0.5 rounded text-xs font-bold uppercase ${
                         locale === l ? 'bg-[#1E3A5F] text-white' : 'bg-gray-100 text-gray-500'
-                      }`}
-                    >
-                      {l}
-                    </button>
+                      }`}>{l}</button>
                   ))}
                 </div>
               </div>
@@ -297,13 +290,12 @@ export default function StyleMatePage() {
               {runningIds.has(selectedProduct.id) && (
                 <div className="text-center py-8">
                   <Loader2 size={28} className="animate-spin text-[#2E86AB] mx-auto mb-2" />
-                  <p className="text-sm text-gray-500">Claude is analysing…</p>
+                  <p className="text-sm text-gray-500">{activeProvider} is analysing…</p>
                 </div>
               )}
 
               {aiResult && (
                 <div className="space-y-4 text-sm">
-                  {/* Quality score */}
                   <div className="bg-gray-50 rounded-lg p-3">
                     <p className="text-xs text-gray-500 mb-1">Quality Score</p>
                     <div className="flex items-center gap-2">
@@ -317,25 +309,21 @@ export default function StyleMatePage() {
                     </div>
                   </div>
 
-                  {/* Title */}
                   <div>
                     <p className="text-xs text-gray-500 mb-1">AI Title ({locale.toUpperCase()})</p>
                     <p className="font-medium text-gray-800">{aiResult.title[locale]}</p>
                   </div>
 
-                  {/* Short description */}
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Short Description ({locale.toUpperCase()})</p>
                     <p className="text-gray-700 leading-relaxed">{aiResult.description[locale].short}</p>
                   </div>
 
-                  {/* SEO */}
                   <div>
                     <p className="text-xs text-gray-500 mb-1">SEO Title ({locale.toUpperCase()})</p>
                     <p className="text-gray-700">{aiResult.seo[locale].metaTitle}</p>
                   </div>
 
-                  {/* Tags */}
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Tags ({locale.toUpperCase()})</p>
                     <div className="flex flex-wrap gap-1">
@@ -345,17 +333,11 @@ export default function StyleMatePage() {
                     </div>
                   </div>
 
-                  {/* Publish button */}
-                  <button
-                    onClick={publishAll}
-                    disabled={publishing}
-                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-[#1E3A5F] text-white font-medium hover:bg-[#16304f] disabled:opacity-50 transition-colors"
-                  >
-                    {publishing ? (
-                      <><Loader2 size={14} className="animate-spin" /> Publishing…</>
-                    ) : (
-                      <><Upload size={14} /> Publish to Live Product</>
-                    )}
+                  <button onClick={publishAll} disabled={publishing}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-[#1E3A5F] text-white font-medium hover:bg-[#16304f] disabled:opacity-50 transition-colors">
+                    {publishing
+                      ? <><Loader2 size={14} className="animate-spin" /> Publishing…</>
+                      : <><Upload size={14} /> Publish to Live Product</>}
                   </button>
                 </div>
               )}

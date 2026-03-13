@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { requireAdminRole } from '@/lib/adminAuth';
 import { z } from 'zod';
+import { PROVIDERS, type AIProvider, hasKeyConfigured, getActiveProvider } from '@/lib/aiProvider';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -11,7 +12,7 @@ const supabase = createClient(
 const TENANT_ID = 1;
 
 const UpdateSchema = z.object({
-  provider: z.enum(['claude', 'gemini']),
+  provider: z.enum(['claude', 'gemini', 'openai']),
 });
 
 export async function GET(request: NextRequest) {
@@ -19,7 +20,7 @@ export async function GET(request: NextRequest) {
   if (!auth.success) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 });
 
   const { data, error } = await supabase
-    .from('settings')           // ← correct table name
+    .from('settings')
     .select('value')
     .eq('tenant_id', TENANT_ID)
     .eq('key', 'ai_provider')
@@ -29,11 +30,15 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to fetch setting' }, { status: 500 });
   }
 
-  const provider = (data?.value as string) ?? (process.env.AI_PROVIDER ?? 'claude');
-  const hasClaudeKey = !!process.env.ANTHROPIC_API_KEY;
-  const hasGeminiKey = !!process.env.GEMINI_API_KEY;
+  const provider: AIProvider = (data?.value as AIProvider) ?? getActiveProvider();
 
-  return NextResponse.json({ provider, hasClaudeKey, hasGeminiKey });
+  // Return all providers with their key status
+  const providers = Object.values(PROVIDERS).map((p) => ({
+    ...p,
+    hasKey: hasKeyConfigured(p.id),
+  }));
+
+  return NextResponse.json({ provider, providers });
 }
 
 export async function POST(request: NextRequest) {
@@ -49,15 +54,16 @@ export async function POST(request: NextRequest) {
 
   const { provider } = parsed.data;
 
-  if (provider === 'claude' && !process.env.ANTHROPIC_API_KEY) {
-    return NextResponse.json({ error: 'ANTHROPIC_API_KEY is not configured in .env.local' }, { status: 400 });
-  }
-  if (provider === 'gemini' && !process.env.GEMINI_API_KEY) {
-    return NextResponse.json({ error: 'GEMINI_API_KEY is not configured in .env.local' }, { status: 400 });
+  if (!hasKeyConfigured(provider as AIProvider)) {
+    const meta = PROVIDERS[provider as AIProvider];
+    return NextResponse.json(
+      { error: `${meta.envKey} is not configured in .env.local` },
+      { status: 400 }
+    );
   }
 
   const { error } = await supabase
-    .from('settings')           // ← correct table name
+    .from('settings')
     .upsert(
       { tenant_id: TENANT_ID, key: 'ai_provider', value: provider },
       { onConflict: 'tenant_id,key' }
