@@ -15,48 +15,49 @@ export interface AdminSession {
   expires: string;
 }
 
-const adminJwtSecret = process.env.ADMIN_JWT_SECRET;
-if (!adminJwtSecret) {
-  throw new Error('ADMIN_JWT_SECRET environment variable is required but not set.');
+function getSecretKey(): Uint8Array {
+  const secret = process.env.ADMIN_JWT_SECRET;
+  if (!secret) {
+    throw new Error('ADMIN_JWT_SECRET is not set in .env.local');
+  }
+  return new TextEncoder().encode(secret);
 }
-const SECRET_KEY = new TextEncoder().encode(adminJwtSecret);
 
 export async function createAdminToken(session: AdminUserSession): Promise<string> {
   return new SignJWT({ admin: session })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('7d')
-    .sign(SECRET_KEY);
+    .sign(getSecretKey());
 }
 
 export async function verifyAdminToken(token: string): Promise<AdminSession | null> {
   try {
-    const verified = await jwtVerify(token, SECRET_KEY);
+    const verified = await jwtVerify(token, getSecretKey());
     return verified.payload as unknown as AdminSession;
   } catch {
     return null;
   }
 }
 
-/**
- * requireAdminRole
- * Used by all /api/admin/* routes in Feature 4B.
- * Reads the admin-token cookie, verifies it, and returns
- * { success, adminId, role, tenantId } or { success: false }.
- */
 export async function requireAdminRole(
   request: NextRequest
 ): Promise<{ success: boolean; adminId?: number; role?: AdminRole; tenantId?: number }> {
-  const token = request.cookies.get('admin-token')?.value;
-  if (!token) return { success: false };
+  try {
+    const token = request.cookies.get('admin-token')?.value;
+    if (!token) return { success: false };
 
-  const session = await verifyAdminToken(token);
-  if (!session?.admin) return { success: false };
+    const session = await verifyAdminToken(token);
+    if (!session?.admin) return { success: false };
 
-  return {
-    success: true,
-    adminId: session.admin.id,
-    role: session.admin.role,
-    tenantId: session.admin.tenantId,
-  };
+    return {
+      success: true,
+      adminId: session.admin.id,
+      role: session.admin.role,
+      tenantId: session.admin.tenantId,
+    };
+  } catch (err) {
+    console.error('requireAdminRole error:', err);
+    return { success: false };
+  }
 }
