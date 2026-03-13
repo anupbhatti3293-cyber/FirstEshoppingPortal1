@@ -36,12 +36,12 @@ export const PROVIDERS: Record<AIProvider, ProviderMeta> = {
   },
   gemini: {
     id: 'gemini',
-    name: 'Gemini 1.5 Pro',
+    name: 'Gemini 2.0 Flash',
     company: 'Google',
-    model: 'gemini-1.5-pro-latest',
+    model: 'gemini-2.0-flash',
     envKey: 'GEMINI_API_KEY',
-    costPerProduct: '~$0.042 per product',
-    description: 'Slightly cheaper output costs. Great if you already have a Google AI account.',
+    costPerProduct: '~$0.015 per product',
+    description: 'Fast, cheap, and capable. Google\'s latest generation model.',
     icon: '✨',
   },
   openai: {
@@ -114,7 +114,7 @@ async function callGemini(system: string, user: string, maxTokens: number): Prom
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error('GEMINI_API_KEY is not set in .env.local');
 
-  const model = PROVIDERS.gemini.model; // gemini-1.5-pro-latest
+  const model = PROVIDERS.gemini.model; // gemini-2.0-flash
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
   for (let attempt = 1; attempt <= 3; attempt++) {
