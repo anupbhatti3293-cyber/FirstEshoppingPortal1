@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "github.com": {
+      "user": "anupbhatti3293-cyber",
+      "personalAccessToken": "${env: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}"
+    },
+    "firebase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "firebase-tools@latest",
+        "experimental:mcp",
+        "--only",
+        "auth,firestore"
+      ]
+    }
+  }
+}
