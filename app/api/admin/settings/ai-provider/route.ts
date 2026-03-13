@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
   if (!auth.success) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 });
 
   const { data, error } = await supabase
-    .from('tenant_settings')
+    .from('settings')           // ← correct table name
     .select('value')
     .eq('tenant_id', TENANT_ID)
     .eq('key', 'ai_provider')
@@ -30,8 +30,6 @@ export async function GET(request: NextRequest) {
   }
 
   const provider = (data?.value as string) ?? (process.env.AI_PROVIDER ?? 'claude');
-
-  // Also return which keys are configured
   const hasClaudeKey = !!process.env.ANTHROPIC_API_KEY;
   const hasGeminiKey = !!process.env.GEMINI_API_KEY;
 
@@ -51,7 +49,6 @@ export async function POST(request: NextRequest) {
 
   const { provider } = parsed.data;
 
-  // Validate the chosen provider has a key configured
   if (provider === 'claude' && !process.env.ANTHROPIC_API_KEY) {
     return NextResponse.json({ error: 'ANTHROPIC_API_KEY is not configured in .env.local' }, { status: 400 });
   }
@@ -60,7 +57,7 @@ export async function POST(request: NextRequest) {
   }
 
   const { error } = await supabase
-    .from('tenant_settings')
+    .from('settings')           // ← correct table name
     .upsert(
       { tenant_id: TENANT_ID, key: 'ai_provider', value: provider },
       { onConflict: 'tenant_id,key' }
