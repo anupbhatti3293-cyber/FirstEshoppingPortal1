@@ -1,255 +1,180 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { getSettings, updateSetting } from '@/lib/supabase';
-import { toast } from 'sonner';
+import { Loader2, CheckCircle, XCircle, Cpu, Zap } from 'lucide-react';
 
-export default function AdminSettingsPage(): JSX.Element {
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [settings, setSettings] = useState({
-    store_name: '',
-    announcement_1: '',
-    announcement_2: '',
-    announcement_3: '',
-    contact_email: '',
-    social_instagram: '',
-    social_facebook: '',
-    social_tiktok: '',
-  });
+type Provider = 'claude' | 'gemini';
+
+interface ProviderStatus {
+  provider: Provider;
+  hasClaudeKey: boolean;
+  hasGeminiKey: boolean;
+}
+
+export default function SettingsPage() {
+  const [status, setStatus] = useState<ProviderStatus | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
+
+  const showToast = (msg: string, type: 'success' | 'error') => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 4000);
+  };
 
   useEffect(() => {
-    loadSettings();
+    fetch('/api/admin/settings/ai-provider')
+      .then((r) => r.json())
+      .then((d) => setStatus(d as ProviderStatus))
+      .catch(() => showToast('Failed to load settings', 'error'))
+      .finally(() => setLoading(false));
   }, []);
 
-  const loadSettings = async (): Promise<void> => {
+  const switchProvider = async (provider: Provider) => {
+    setSaving(true);
     try {
-      const data = await getSettings(1);
-      setSettings({
-        store_name: data.store_name || '',
-        announcement_1: data.announcement_1 || '',
-        announcement_2: data.announcement_2 || '',
-        announcement_3: data.announcement_3 || '',
-        contact_email: data.contact_email || '',
-        social_instagram: data.social_instagram || '',
-        social_facebook: data.social_facebook || '',
-        social_tiktok: data.social_tiktok || '',
+      const res = await fetch('/api/admin/settings/ai-provider', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ provider }),
       });
-    } catch (error) {
-      console.error('Failed to load settings:', error);
-      toast.error('Failed to load settings');
+      const data = await res.json() as { error?: string };
+      if (!res.ok) throw new Error(data.error ?? 'Failed to save');
+      setStatus((prev) => prev ? { ...prev, provider } : prev);
+      showToast(`Switched to ${provider === 'claude' ? 'Claude (Anthropic)' : 'Gemini (Google)'}`, 'success');
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : 'Failed to save', 'error');
     } finally {
-      setIsLoading(false);
+      setSaving(false);
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
-    setSettings((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
-    e.preventDefault();
-    setIsSaving(true);
-
-    try {
-      const promises = Object.entries(settings).map(([key, value]) =>
-        updateSetting(key, value, 1)
-      );
-
-      await Promise.all(promises);
-      toast.success('Settings saved successfully');
-    } catch (error) {
-      console.error('Failed to save settings:', error);
-      toast.error('Failed to save settings');
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-gray-500">Loading settings...</div>
-      </div>
-    );
-  }
+  const providers = [
+    {
+      id: 'claude' as Provider,
+      name: 'Claude Sonnet 4.6',
+      company: 'Anthropic',
+      envKey: 'ANTHROPIC_API_KEY',
+      hasKey: status?.hasClaudeKey ?? false,
+      description: 'Best for nuanced brand copywriting and tone consistency.',
+      cost: '~$0.046 per product',
+      icon: '🧠',
+    },
+    {
+      id: 'gemini' as Provider,
+      name: 'Gemini 1.5 Pro',
+      company: 'Google',
+      envKey: 'GEMINI_API_KEY',
+      hasKey: status?.hasGeminiKey ?? false,
+      description: 'Slightly cheaper output costs. Great if you already have a Google AI account.',
+      cost: '~$0.042 per product',
+      icon: '✨',
+    },
+  ];
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold text-[#1E3A5F] mb-8">Store Settings</h1>
-
-      <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl">
-        <Card>
-          <CardHeader>
-            <CardTitle>General Settings</CardTitle>
-            <CardDescription>
-              Configure your store name and contact information
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <label htmlFor="store_name" className="block text-sm font-medium text-gray-700 mb-1">
-                Store Name
-              </label>
-              <Input
-                id="store_name"
-                name="store_name"
-                value={settings.store_name}
-                onChange={handleChange}
-                placeholder="LuxeHaven"
-                required
-              />
-            </div>
-
-            <div>
-              <label htmlFor="contact_email" className="block text-sm font-medium text-gray-700 mb-1">
-                Contact Email
-              </label>
-              <Input
-                id="contact_email"
-                name="contact_email"
-                type="email"
-                value={settings.contact_email}
-                onChange={handleChange}
-                placeholder="hello@luxehaven.com"
-                required
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Announcement Bar Messages</CardTitle>
-            <CardDescription>
-              These messages rotate every 4 seconds on the homepage
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <label htmlFor="announcement_1" className="block text-sm font-medium text-gray-700 mb-1">
-                Message 1
-              </label>
-              <Textarea
-                id="announcement_1"
-                name="announcement_1"
-                value={settings.announcement_1}
-                onChange={handleChange}
-                placeholder="Free Shipping on Orders Over $50"
-                rows={2}
-                required
-              />
-            </div>
-
-            <div>
-              <label htmlFor="announcement_2" className="block text-sm font-medium text-gray-700 mb-1">
-                Message 2
-              </label>
-              <Textarea
-                id="announcement_2"
-                name="announcement_2"
-                value={settings.announcement_2}
-                onChange={handleChange}
-                placeholder="UK Orders: No Customs Fees"
-                rows={2}
-                required
-              />
-            </div>
-
-            <div>
-              <label htmlFor="announcement_3" className="block text-sm font-medium text-gray-700 mb-1">
-                Message 3
-              </label>
-              <Textarea
-                id="announcement_3"
-                name="announcement_3"
-                value={settings.announcement_3}
-                onChange={handleChange}
-                placeholder="New Arrivals Every Day"
-                rows={2}
-                required
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Social Media Links</CardTitle>
-            <CardDescription>
-              Update your social media profile URLs
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <label htmlFor="social_instagram" className="block text-sm font-medium text-gray-700 mb-1">
-                Instagram URL
-              </label>
-              <Input
-                id="social_instagram"
-                name="social_instagram"
-                type="url"
-                value={settings.social_instagram}
-                onChange={handleChange}
-                placeholder="https://instagram.com/luxehaven"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="social_facebook" className="block text-sm font-medium text-gray-700 mb-1">
-                Facebook URL
-              </label>
-              <Input
-                id="social_facebook"
-                name="social_facebook"
-                type="url"
-                value={settings.social_facebook}
-                onChange={handleChange}
-                placeholder="https://facebook.com/luxehaven"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="social_tiktok" className="block text-sm font-medium text-gray-700 mb-1">
-                TikTok URL
-              </label>
-              <Input
-                id="social_tiktok"
-                name="social_tiktok"
-                type="url"
-                value={settings.social_tiktok}
-                onChange={handleChange}
-                placeholder="https://tiktok.com/@luxehaven"
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        <div className="flex gap-4">
-          <Button
-            type="submit"
-            className="bg-[#2E86AB] hover:bg-[#1E3A5F] text-white"
-            disabled={isSaving}
-          >
-            {isSaving ? 'Saving...' : 'Save Settings'}
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={loadSettings}
-            disabled={isSaving}
-          >
-            Reset
-          </Button>
+    <div className="p-6 max-w-3xl">
+      {toast && (
+        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-white text-sm font-medium ${
+          toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'
+        }`}>
+          {toast.msg}
         </div>
-      </form>
+      )}
+
+      <h1 className="text-3xl font-bold text-[#1E3A5F] mb-1" style={{ fontFamily: 'Playfair Display, serif' }}>
+        Settings
+      </h1>
+      <p className="text-gray-500 mb-8">Configure your LuxeHaven admin preferences.</p>
+
+      {/* AI Provider Section */}
+      <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+        <div className="flex items-center gap-2 mb-1">
+          <Cpu size={18} className="text-[#2E86AB]" />
+          <h2 className="font-semibold text-[#1E3A5F]">StyleMate AI Provider</h2>
+        </div>
+        <p className="text-gray-500 text-sm mb-6">
+          Choose which AI model powers your product optimisation. Both produce excellent results — switch anytime.
+        </p>
+
+        {loading ? (
+          <div className="flex justify-center py-8">
+            <Loader2 size={24} className="animate-spin text-[#2E86AB]" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {providers.map((p) => {
+              const isActive = status?.provider === p.id;
+              const canActivate = p.hasKey;
+              return (
+                <div
+                  key={p.id}
+                  className={`rounded-xl border-2 p-5 transition-all ${
+                    isActive
+                      ? 'border-[#2E86AB] bg-blue-50'
+                      : 'border-gray-200 bg-white'
+                  }`}
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <span className="text-2xl">{p.icon}</span>
+                      <p className="font-semibold text-[#1E3A5F] mt-1">{p.name}</p>
+                      <p className="text-xs text-gray-400">{p.company}</p>
+                    </div>
+                    {isActive && (
+                      <span className="px-2 py-0.5 bg-[#2E86AB] text-white rounded-full text-xs font-medium">
+                        Active
+                      </span>
+                    )}
+                  </div>
+
+                  <p className="text-sm text-gray-600 mb-3">{p.description}</p>
+
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <Zap size={12} className="text-amber-500" />
+                    <span className="text-xs text-gray-500">{p.cost}</span>
+                  </div>
+
+                  {/* API Key status */}
+                  <div className="flex items-center gap-1.5 mb-4">
+                    {p.hasKey ? (
+                      <><CheckCircle size={12} className="text-green-500" />
+                      <span className="text-xs text-green-600">{p.envKey} configured</span></>
+                    ) : (
+                      <><XCircle size={12} className="text-red-400" />
+                      <span className="text-xs text-red-500">{p.envKey} not set in .env.local</span></>
+                    )}
+                  </div>
+
+                  <button
+                    onClick={() => switchProvider(p.id)}
+                    disabled={isActive || !canActivate || saving}
+                    className={`w-full py-2 rounded-lg text-sm font-medium transition-colors ${
+                      isActive
+                        ? 'bg-[#2E86AB] text-white cursor-default'
+                        : canActivate
+                        ? 'bg-[#1E3A5F] text-white hover:bg-[#16304f]'
+                        : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    }`}
+                  >
+                    {saving ? <Loader2 size={14} className="animate-spin mx-auto" /> :
+                      isActive ? 'Currently Active' :
+                      !canActivate ? 'Add API Key First' :
+                      `Switch to ${p.name}`}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+          <p className="text-xs text-amber-700">
+            <strong>To activate a provider:</strong> add its API key to your <code>.env.local</code> file and restart the dev server.
+            Both keys can coexist — the active provider is used for all new StyleMate AI runs.
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
