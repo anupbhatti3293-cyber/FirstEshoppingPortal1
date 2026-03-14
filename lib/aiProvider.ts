@@ -1,11 +1,6 @@
 // ============================================================
 // LuxeHaven AI Provider System
 // ============================================================
-// Plugin-based architecture — add any new AI in ~20 lines.
-// Gemini uses the official @google/genai SDK (auto-handles
-// API versioning, retries, model updates).
-// ============================================================
-
 import { GoogleGenAI } from '@google/genai';
 
 export type AIProvider = 'claude' | 'gemini' | 'openai';
@@ -21,7 +16,6 @@ export interface ProviderMeta {
   icon: string;
 }
 
-// ── Provider registry ────────────────────────────────────────────────
 export const PROVIDERS: Record<AIProvider, ProviderMeta> = {
   claude: {
     id: 'claude',
@@ -69,30 +63,18 @@ export function hasKeyConfigured(provider: AIProvider): boolean {
   return !!process.env[PROVIDERS[provider].envKey];
 }
 
-// ── Claude (Anthropic) ──────────────────────────────────────────────
+// ── Claude ────────────────────────────────────────────────────
 async function callClaude(system: string, user: string, maxTokens: number): Promise<string> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error('ANTHROPIC_API_KEY is not set in .env.local');
-
   for (let attempt = 1; attempt <= 3; attempt++) {
     try {
       const res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-        },
-        body: JSON.stringify({
-          model: PROVIDERS.claude.model,
-          max_tokens: maxTokens,
-          system,
-          messages: [{ role: 'user', content: user }],
-        }),
+        headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
+        body: JSON.stringify({ model: PROVIDERS.claude.model, max_tokens: maxTokens, system, messages: [{ role: 'user', content: user }] }),
       });
-      if (res.status === 529 || res.status === 503) {
-        if (attempt < 3) { await sleep(attempt * 10000); continue; }
-      }
+      if ((res.status === 529 || res.status === 503) && attempt < 3) { await sleep(attempt * 10000); continue; }
       if (!res.ok) throw new Error(`Claude API ${res.status}: ${await res.text()}`);
       const data = await res.json() as { content: Array<{ type: string; text: string }> };
       const block = data.content.find((b) => b.type === 'text');
@@ -106,12 +88,12 @@ async function callClaude(system: string, user: string, maxTokens: number): Prom
   throw new Error('Claude failed after 3 attempts');
 }
 
-// ── Gemini (Google) — uses official @google/genai SDK ───────────────
-// responseMimeType: 'application/json' forces clean JSON output
+// ── Gemini ────────────────────────────────────────────────────
+// NOTE: responseMimeType removed — it causes pretty-printing which wastes tokens
+// Compact JSON is requested via the system prompt instead
 async function callGemini(system: string, user: string, maxTokens: number): Promise<string> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error('GEMINI_API_KEY is not set in .env.local');
-
   for (let attempt = 1; attempt <= 3; attempt++) {
     try {
       const ai = new GoogleGenAI({ apiKey });
@@ -122,7 +104,7 @@ async function callGemini(system: string, user: string, maxTokens: number): Prom
           systemInstruction: system,
           maxOutputTokens: maxTokens,
           temperature: 0.7,
-          responseMimeType: 'application/json',
+          // No responseMimeType — it triggers pretty-printing that wastes tokens
         },
       });
       const text = response.text;
@@ -130,10 +112,7 @@ async function callGemini(system: string, user: string, maxTokens: number): Prom
       return text;
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      if ((msg.includes('429') || msg.includes('503')) && attempt < 3) {
-        await sleep(attempt * 10000);
-        continue;
-      }
+      if ((msg.includes('429') || msg.includes('503')) && attempt < 3) { await sleep(attempt * 10000); continue; }
       if (attempt === 3) throw err;
       await sleep(attempt * 5000);
     }
@@ -141,31 +120,18 @@ async function callGemini(system: string, user: string, maxTokens: number): Prom
   throw new Error('Gemini failed after 3 attempts');
 }
 
-// ── OpenAI (ChatGPT) ────────────────────────────────────────────────
+// ── OpenAI ────────────────────────────────────────────────────
 async function callOpenAI(system: string, user: string, maxTokens: number): Promise<string> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) throw new Error('OPENAI_API_KEY is not set in .env.local');
-
   for (let attempt = 1; attempt <= 3; attempt++) {
     try {
       const res = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          model: PROVIDERS.openai.model,
-          max_tokens: maxTokens,
-          messages: [
-            { role: 'system', content: system },
-            { role: 'user', content: user },
-          ],
-        }),
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+        body: JSON.stringify({ model: PROVIDERS.openai.model, max_tokens: maxTokens, messages: [{ role: 'system', content: system }, { role: 'user', content: user }] }),
       });
-      if (res.status === 503 || res.status === 429) {
-        if (attempt < 3) { await sleep(attempt * 10000); continue; }
-      }
+      if ((res.status === 503 || res.status === 429) && attempt < 3) { await sleep(attempt * 10000); continue; }
       if (!res.ok) throw new Error(`OpenAI API ${res.status}: ${await res.text()}`);
       const data = await res.json() as { choices: Array<{ message: { content: string } }> };
       const text = data.choices?.[0]?.message?.content;
@@ -179,13 +145,8 @@ async function callOpenAI(system: string, user: string, maxTokens: number): Prom
   throw new Error('OpenAI failed after 3 attempts');
 }
 
-// ── Public unified interface ─────────────────────────────────────────
-export async function callAI(
-  system: string,
-  user: string,
-  maxTokens = 1500,
-  providerOverride?: AIProvider
-): Promise<string> {
+// ── Public interface ────────────────────────────────────────────
+export async function callAI(system: string, user: string, maxTokens = 4096, providerOverride?: AIProvider): Promise<string> {
   const provider = providerOverride ?? getActiveProvider();
   switch (provider) {
     case 'gemini': return callGemini(system, user, maxTokens);
@@ -194,45 +155,31 @@ export async function callAI(
   }
 }
 
-// ── Robust JSON parser ───────────────────────────────────────────────
-// Handles: clean JSON, ```json fences, prose + JSON mixed responses
+// ── Robust JSON extractor ──────────────────────────────────────
 export function parseAIJson<T>(raw: string): T {
-  // 1. Strip markdown fences
-  let cleaned = raw
+  const cleaned = raw
     .replace(/^```json\s*/i, '')
     .replace(/^```\s*/i, '')
     .replace(/```\s*$/i, '')
     .trim();
 
-  // 2. Try direct parse first
-  try {
-    return JSON.parse(cleaned) as T;
-  } catch {
-    // 3. Extract first { ... } or [ ... ] block (handles prose wrapping)
-    const objMatch = cleaned.match(/(\{[\s\S]*\})/);
-    const arrMatch = cleaned.match(/(\[[\s\S]*\])/);
+  // Try direct parse
+  try { return JSON.parse(cleaned) as T; } catch { /* continue */ }
 
-    // Pick whichever appears first in the string
-    let extracted: string | null = null;
-    if (objMatch && arrMatch) {
-      extracted = cleaned.indexOf(objMatch[0]) < cleaned.indexOf(arrMatch[0])
-        ? objMatch[0] : arrMatch[0];
-    } else {
-      extracted = objMatch?.[0] ?? arrMatch?.[0] ?? null;
-    }
-
-    if (extracted) {
-      try {
-        return JSON.parse(extracted) as T;
-      } catch {
-        // fall through to error
-      }
-    }
-
-    throw new Error(`Failed to parse AI JSON: ${cleaned.slice(0, 300)}`);
+  // Extract first {...} or [...] block
+  const objMatch = cleaned.match(/(\{[\s\S]*\})/);
+  const arrMatch = cleaned.match(/(\[[\s\S]*\])/);
+  let extracted: string | null = null;
+  if (objMatch && arrMatch) {
+    extracted = cleaned.indexOf(objMatch[0]) < cleaned.indexOf(arrMatch[0]) ? objMatch[0] : arrMatch[0];
+  } else {
+    extracted = objMatch?.[0] ?? arrMatch?.[0] ?? null;
   }
+  if (extracted) {
+    try { return JSON.parse(extracted) as T; } catch { /* continue */ }
+  }
+
+  throw new Error(`Failed to parse AI JSON: ${cleaned.slice(0, 300)}`);
 }
 
-function sleep(ms: number) {
-  return new Promise((r) => setTimeout(r, ms));
-}
+function sleep(ms: number) { return new Promise((r) => setTimeout(r, ms)); }

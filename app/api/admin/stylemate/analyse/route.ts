@@ -22,13 +22,13 @@ const supabase = createClient(
 const TENANT_ID = 1;
 const PROMPT_VERSION = 'v1.0';
 
-// Token limits — generous to prevent truncation
-// Gemini pretty-prints JSON with spaces/newlines which uses more tokens
+// Very generous token limits — Gemini pretty-prints JSON so needs headroom
+// These are output token limits only; cost is still ~$0.015 per product
 const TOKENS = {
-  title:   800,   // ~100 chars × 2 locales, plus JSON structure
-  desc:    2000,  // 300-500 words × 2 locales
-  seo:     2500,  // meta + tags + 5 FAQs × 2 locales
-  quality: 1000,  // score + breakdown + notes
+  title:   2048,
+  desc:    8192,
+  seo:     8192,
+  quality: 2048,
 };
 
 export async function POST(request: NextRequest) {
@@ -63,29 +63,26 @@ export async function POST(request: NextRequest) {
 
     const imageCount = Array.isArray(product.product_images) ? product.product_images.length : 0;
 
-    // ── Prompts ───────────────────────────────────────────────────────
+    // ── Prompts ───────────────────────────────────────────────
     const titleSystem = `You are a conversion copywriter for LuxeHaven, a premium US/UK dropshipping store.
 Brand voice: luxurious, trustworthy, aspirational.
-Return ONLY a valid JSON object with no extra text:
-{ "us": "title for US market", "uk": "title for UK market" }
+IMPORTANT: Return ONLY a raw JSON object on a single line, no explanation, no markdown:
+{"us":"title for US market","uk":"title for UK market"}
 Rules: Emotional hook + key feature + trust signal. No supplier names, no keyword stuffing.`;
 
     const descSystem = `You are a conversion copywriter for LuxeHaven, a premium US/UK dropshipping store.
-Return ONLY a valid JSON object with no extra text:
-{ "us": { "full": "300-500 word description", "short": "under 100 word summary" }, "uk": { "full": "300-500 word description", "short": "under 100 word summary" } }
+IMPORTANT: Return ONLY a raw JSON object, no explanation, no markdown:
+{"us":{"full":"300-500 word description","short":"under 100 word summary"},"uk":{"full":"300-500 word description","short":"under 100 word summary"}}
 Structure: Hook → Problem solved → 3-5 benefits → Social proof → CTA.
 US: American English, lifestyle-forward. UK: British English (colour/favourite/organise), quality-focused.`;
 
     const seoSystem = `You are an SEO specialist for LuxeHaven, a premium US/UK dropshipping store.
-Return ONLY a valid JSON object with no extra text:
-{
-  "us": { "metaTitle": "max 60 chars", "metaDescription": "max 160 chars", "tags": ["tag1","tag2","tag3","tag4","tag5"], "faq": [{"q":"question","a":"answer"},{"q":"question","a":"answer"},{"q":"question","a":"answer"},{"q":"question","a":"answer"},{"q":"question","a":"answer"}] },
-  "uk": { "metaTitle": "max 60 chars", "metaDescription": "max 160 chars", "tags": ["tag1","tag2","tag3","tag4","tag5"], "faq": [{"q":"question","a":"answer"},{"q":"question","a":"answer"},{"q":"question","a":"answer"},{"q":"question","a":"answer"},{"q":"question","a":"answer"}] }
-}`;
+IMPORTANT: Return ONLY a raw JSON object, no explanation, no markdown:
+{"us":{"metaTitle":"max 60 chars","metaDescription":"max 160 chars","tags":["tag1","tag2","tag3","tag4","tag5"],"faq":[{"q":"question","a":"answer"},{"q":"question","a":"answer"},{"q":"question","a":"answer"},{"q":"question","a":"answer"},{"q":"question","a":"answer"}]},"uk":{"metaTitle":"max 60 chars","metaDescription":"max 160 chars","tags":["tag1","tag2","tag3","tag4","tag5"],"faq":[{"q":"question","a":"answer"},{"q":"question","a":"answer"},{"q":"question","a":"answer"},{"q":"question","a":"answer"},{"q":"question","a":"answer"}]}}`;
 
     const qualitySystem = `You are a product quality analyst for LuxeHaven.
-Return ONLY a valid JSON object with no extra text:
-{ "score": 75, "breakdown": { "descriptionQuality": 18, "imageQuality": 15, "supplierReliability": 14, "reviewSentiment": 16, "marketDemand": 12 }, "badge": "qa_approved", "notes": "brief notes here" }
+IMPORTANT: Return ONLY a raw JSON object, no explanation, no markdown:
+{"score":75,"breakdown":{"descriptionQuality":18,"imageQuality":15,"supplierReliability":14,"reviewSentiment":16,"marketDemand":12},"badge":"qa_approved","notes":"brief notes"}
 Badge rules: 0-49=none, 50-69=verified, 70-84=qa_approved, 85-100=engineer_tested.`;
 
     const base = `Product: ${product.name}
@@ -94,7 +91,6 @@ Price: $${product.base_price_usd} USD / £${product.base_price_gbp} GBP
 Rating: ${product.rating_average}/5 from ${product.rating_count} reviews
 Description: ${product.description ?? 'Not provided'}`;
 
-    // Run all 4 AI calls in parallel with generous token limits
     const [titleRaw, descRaw, seoRaw, qualityRaw] = await Promise.all([
       callAI(titleSystem, base, TOKENS.title, provider),
       callAI(descSystem, base, TOKENS.desc, provider),
@@ -102,7 +98,6 @@ Description: ${product.description ?? 'Not provided'}`;
       callAI(qualitySystem, `${base}\nImage count: ${imageCount}\nStock: ${product.stock_quantity}`, TOKENS.quality, provider),
     ]);
 
-    // Parse with detailed per-field error reporting
     let titleData: TitleOutput;
     let descData: DescriptionOutput;
     let seoData: SeoOutput;
@@ -154,15 +149,8 @@ Description: ${product.description ?? 'Not provided'}`;
     }
 
     return NextResponse.json({
-      success: true,
-      productId,
-      provider: activeModel,
-      result: {
-        title: titleData!,
-        description: descData!,
-        seo: seoData!,
-        quality: qualityData!,
-      },
+      success: true, productId, provider: activeModel,
+      result: { title: titleData!, description: descData!, seo: seoData!, quality: qualityData! },
     });
 
   } catch (err) {
