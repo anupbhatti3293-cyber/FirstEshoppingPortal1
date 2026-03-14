@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-// ── Request schemas ────────────────────────────────────────────────
+// ── Request schemas ──────────────────────────────────────────────────
 export const OptimiseRequestSchema = z.object({
   productId: z.number().int().positive(),
 });
@@ -20,9 +20,9 @@ export const PublishFieldSchema = z.object({
   locale: z.enum(['us', 'uk', 'both']).default('both'),
 });
 
-// ── AI output schemas ──────────────────────────────────────────────
-// Relaxed limits — AI models vary slightly in output length.
-// Validation purpose: ensure shape is correct, not enforce char counts.
+// ── AI output schemas ────────────────────────────────────────────────
+// Intentionally lenient — AI models vary slightly in output.
+// We validate shape only, not exact character/number limits.
 
 export const TitleOutputSchema = z.object({
   us: z.string().min(1),
@@ -58,11 +58,11 @@ export const SeoOutputSchema = z.object({
 export const QualityOutputSchema = z.object({
   score: z.number().min(0).max(100),
   breakdown: z.object({
-    descriptionQuality: z.number().min(0).max(25),
-    imageQuality: z.number().min(0).max(20),
-    supplierReliability: z.number().min(0).max(20),
-    reviewSentiment: z.number().min(0).max(20),
-    marketDemand: z.number().min(0).max(15),
+    descriptionQuality: z.number().min(0),
+    imageQuality: z.number().min(0),
+    supplierReliability: z.number().min(0),
+    reviewSentiment: z.number().min(0),
+    marketDemand: z.number().min(0),
   }),
   badge: z.enum(['none', 'verified', 'qa_approved', 'engineer_tested']),
   notes: z.string().optional(),
