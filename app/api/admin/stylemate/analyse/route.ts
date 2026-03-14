@@ -22,6 +22,15 @@ const supabase = createClient(
 const TENANT_ID = 1;
 const PROMPT_VERSION = 'v1.0';
 
+// Token limits — generous to prevent truncation
+// Gemini pretty-prints JSON with spaces/newlines which uses more tokens
+const TOKENS = {
+  title:   800,   // ~100 chars × 2 locales, plus JSON structure
+  desc:    2000,  // 300-500 words × 2 locales
+  seo:     2500,  // meta + tags + 5 FAQs × 2 locales
+  quality: 1000,  // score + breakdown + notes
+};
+
 export async function POST(request: NextRequest) {
   try {
     const auth = await requireAdminRole(request);
@@ -54,7 +63,7 @@ export async function POST(request: NextRequest) {
 
     const imageCount = Array.isArray(product.product_images) ? product.product_images.length : 0;
 
-    // ── Prompts ───────────────────────────────────────────────
+    // ── Prompts ───────────────────────────────────────────────────────
     const titleSystem = `You are a conversion copywriter for LuxeHaven, a premium US/UK dropshipping store.
 Brand voice: luxurious, trustworthy, aspirational.
 Return ONLY a valid JSON object with no extra text:
@@ -85,31 +94,31 @@ Price: $${product.base_price_usd} USD / £${product.base_price_gbp} GBP
 Rating: ${product.rating_average}/5 from ${product.rating_count} reviews
 Description: ${product.description ?? 'Not provided'}`;
 
-    // Run all 4 AI calls in parallel
+    // Run all 4 AI calls in parallel with generous token limits
     const [titleRaw, descRaw, seoRaw, qualityRaw] = await Promise.all([
-      callAI(titleSystem, base, 400, provider),
-      callAI(descSystem, base, 1500, provider),
-      callAI(seoSystem, `${base}\nExisting tags: ${(product.tags ?? []).join(', ')}`, 1200, provider),
-      callAI(qualitySystem, `${base}\nImage count: ${imageCount}\nStock: ${product.stock_quantity}`, 600, provider),
+      callAI(titleSystem, base, TOKENS.title, provider),
+      callAI(descSystem, base, TOKENS.desc, provider),
+      callAI(seoSystem, `${base}\nExisting tags: ${(product.tags ?? []).join(', ')}`, TOKENS.seo, provider),
+      callAI(qualitySystem, `${base}\nImage count: ${imageCount}\nStock: ${product.stock_quantity}`, TOKENS.quality, provider),
     ]);
 
-    // Parse with detailed error reporting per field
+    // Parse with detailed per-field error reporting
     let titleData: TitleOutput;
     let descData: DescriptionOutput;
     let seoData: SeoOutput;
     let qualityData: QualityOutput;
 
     try { titleData = TitleOutputSchema.parse(parseAIJson<TitleOutput>(titleRaw)); }
-    catch (e) { throw new Error(`Title parse failed: ${e instanceof Error ? e.message : String(e)} | Raw: ${titleRaw.slice(0, 200)}`); }
+    catch (e) { throw new Error(`Title parse failed: ${e instanceof Error ? e.message : String(e)} | Raw: ${titleRaw.slice(0, 300)}`); }
 
     try { descData = DescriptionOutputSchema.parse(parseAIJson<DescriptionOutput>(descRaw)); }
-    catch (e) { throw new Error(`Description parse failed: ${e instanceof Error ? e.message : String(e)} | Raw: ${descRaw.slice(0, 200)}`); }
+    catch (e) { throw new Error(`Description parse failed: ${e instanceof Error ? e.message : String(e)} | Raw: ${descRaw.slice(0, 300)}`); }
 
     try { seoData = SeoOutputSchema.parse(parseAIJson<SeoOutput>(seoRaw)); }
-    catch (e) { throw new Error(`SEO parse failed: ${e instanceof Error ? e.message : String(e)} | Raw: ${seoRaw.slice(0, 200)}`); }
+    catch (e) { throw new Error(`SEO parse failed: ${e instanceof Error ? e.message : String(e)} | Raw: ${seoRaw.slice(0, 300)}`); }
 
     try { qualityData = QualityOutputSchema.parse(parseAIJson<QualityOutput>(qualityRaw)); }
-    catch (e) { throw new Error(`Quality parse failed: ${e instanceof Error ? e.message : String(e)} | Raw: ${qualityRaw.slice(0, 200)}`); }
+    catch (e) { throw new Error(`Quality parse failed: ${e instanceof Error ? e.message : String(e)} | Raw: ${qualityRaw.slice(0, 300)}`); }
 
     const { error: upsertError } = await supabase
       .from('ai_product_analysis')
