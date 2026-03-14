@@ -1,12 +1,33 @@
-pandas
-numpy
-requests
-psycopg2-binary
-sqlalchemy
-python-dotenv
+# LuxeHaven AI Pipeline — Python Dependencies
+# Python 3.11+
+
+# Data processing
+pandas==2.2.1
+numpy==1.26.4
+
+# HTTP requests
+requests==2.31.0
+urllib3==2.2.1
+
+# Database
+psycopg2-binary==2.9.9
+sqlalchemy==2.0.29
+
+# Environment variables
+python-dotenv==1.0.1
+
+# Pydantic (settings validation)
 pydantic-settings
 pydantic
-google-generativeai
-rapidfuzz
-python-dateutil
-coloredlogs
+
+# Google Gemini AI SDK
+google-generativeai==0.8.3
+
+# Fuzzy string matching (for cross-platform product deduplication)
+rapidfuzz==3.9.0
+
+# Date utilities
+python-dateutil==2.9.0
+
+# Logging
+coloredlogs==15.0.1
