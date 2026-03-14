@@ -21,7 +21,7 @@ export interface ProviderMeta {
   icon: string;
 }
 
-// ── Provider registry ───────────────────────────────────────────────
+// ── Provider registry ────────────────────────────────────────────────
 export const PROVIDERS: Record<AIProvider, ProviderMeta> = {
   claude: {
     id: 'claude',
@@ -69,7 +69,7 @@ export function hasKeyConfigured(provider: AIProvider): boolean {
   return !!process.env[PROVIDERS[provider].envKey];
 }
 
-// ── Claude (Anthropic) ─────────────────────────────────────────
+// ── Claude (Anthropic) ──────────────────────────────────────────────
 async function callClaude(system: string, user: string, maxTokens: number): Promise<string> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error('ANTHROPIC_API_KEY is not set in .env.local');
@@ -106,7 +106,8 @@ async function callClaude(system: string, user: string, maxTokens: number): Prom
   throw new Error('Claude failed after 3 attempts');
 }
 
-// ── Gemini (Google) — uses official @google/genai SDK ──────────────
+// ── Gemini (Google) — uses official @google/genai SDK ───────────────
+// responseMimeType: 'application/json' forces clean JSON output
 async function callGemini(system: string, user: string, maxTokens: number): Promise<string> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error('GEMINI_API_KEY is not set in .env.local');
@@ -121,6 +122,7 @@ async function callGemini(system: string, user: string, maxTokens: number): Prom
           systemInstruction: system,
           maxOutputTokens: maxTokens,
           temperature: 0.7,
+          responseMimeType: 'application/json',
         },
       });
       const text = response.text;
@@ -128,7 +130,6 @@ async function callGemini(system: string, user: string, maxTokens: number): Prom
       return text;
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      // Retry on quota/overload errors
       if ((msg.includes('429') || msg.includes('503')) && attempt < 3) {
         await sleep(attempt * 10000);
         continue;
@@ -140,7 +141,7 @@ async function callGemini(system: string, user: string, maxTokens: number): Prom
   throw new Error('Gemini failed after 3 attempts');
 }
 
-// ── OpenAI (ChatGPT) ──────────────────────────────────────────
+// ── OpenAI (ChatGPT) ────────────────────────────────────────────────
 async function callOpenAI(system: string, user: string, maxTokens: number): Promise<string> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) throw new Error('OPENAI_API_KEY is not set in .env.local');
@@ -178,7 +179,7 @@ async function callOpenAI(system: string, user: string, maxTokens: number): Prom
   throw new Error('OpenAI failed after 3 attempts');
 }
 
-// ── Public unified interface ──────────────────────────────────
+// ── Public unified interface ─────────────────────────────────────────
 export async function callAI(
   system: string,
   user: string,
@@ -193,15 +194,41 @@ export async function callAI(
   }
 }
 
+// ── Robust JSON parser ───────────────────────────────────────────────
+// Handles: clean JSON, ```json fences, prose + JSON mixed responses
 export function parseAIJson<T>(raw: string): T {
-  const cleaned = raw
+  // 1. Strip markdown fences
+  let cleaned = raw
     .replace(/^```json\s*/i, '')
     .replace(/^```\s*/i, '')
     .replace(/```\s*$/i, '')
     .trim();
+
+  // 2. Try direct parse first
   try {
     return JSON.parse(cleaned) as T;
   } catch {
+    // 3. Extract first { ... } or [ ... ] block (handles prose wrapping)
+    const objMatch = cleaned.match(/(\{[\s\S]*\})/);
+    const arrMatch = cleaned.match(/(\[[\s\S]*\])/);
+
+    // Pick whichever appears first in the string
+    let extracted: string | null = null;
+    if (objMatch && arrMatch) {
+      extracted = cleaned.indexOf(objMatch[0]) < cleaned.indexOf(arrMatch[0])
+        ? objMatch[0] : arrMatch[0];
+    } else {
+      extracted = objMatch?.[0] ?? arrMatch?.[0] ?? null;
+    }
+
+    if (extracted) {
+      try {
+        return JSON.parse(extracted) as T;
+      } catch {
+        // fall through to error
+      }
+    }
+
     throw new Error(`Failed to parse AI JSON: ${cleaned.slice(0, 300)}`);
   }
 }
