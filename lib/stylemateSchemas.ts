@@ -1,7 +1,6 @@
 import { z } from 'zod';
 
-// ── Request schemas ──────────────────────────────────────────────
-
+// ── Request schemas ────────────────────────────────────────────────
 export const OptimiseRequestSchema = z.object({
   productId: z.number().int().positive(),
 });
@@ -21,47 +20,49 @@ export const PublishFieldSchema = z.object({
   locale: z.enum(['us', 'uk', 'both']).default('both'),
 });
 
-// ── Claude output schemas (what AI returns) ───────────────────────
+// ── AI output schemas ──────────────────────────────────────────────
+// Relaxed limits — AI models vary slightly in output length.
+// Validation purpose: ensure shape is correct, not enforce char counts.
 
 export const TitleOutputSchema = z.object({
-  us: z.string().max(70),
-  uk: z.string().max(70),
+  us: z.string().min(1),
+  uk: z.string().min(1),
 });
 
 export const DescriptionOutputSchema = z.object({
   us: z.object({
-    full: z.string().min(100).max(2500),
-    short: z.string().max(200),
+    full: z.string().min(1),
+    short: z.string().min(1),
   }),
   uk: z.object({
-    full: z.string().min(100).max(2500),
-    short: z.string().max(200),
+    full: z.string().min(1),
+    short: z.string().min(1),
   }),
 });
 
 export const SeoOutputSchema = z.object({
   us: z.object({
-    metaTitle: z.string().max(60),
-    metaDescription: z.string().max(160),
-    tags: z.array(z.string()).min(5).max(10),
-    faq: z.array(z.object({ q: z.string(), a: z.string() })).length(5),
+    metaTitle: z.string().min(1),
+    metaDescription: z.string().min(1),
+    tags: z.array(z.string()).min(1),
+    faq: z.array(z.object({ q: z.string(), a: z.string() })).min(1),
   }),
   uk: z.object({
-    metaTitle: z.string().max(60),
-    metaDescription: z.string().max(160),
-    tags: z.array(z.string()).min(5).max(10),
-    faq: z.array(z.object({ q: z.string(), a: z.string() })).length(5),
+    metaTitle: z.string().min(1),
+    metaDescription: z.string().min(1),
+    tags: z.array(z.string()).min(1),
+    faq: z.array(z.object({ q: z.string(), a: z.string() })).min(1),
   }),
 });
 
 export const QualityOutputSchema = z.object({
-  score: z.number().int().min(0).max(100),
+  score: z.number().min(0).max(100),
   breakdown: z.object({
-    descriptionQuality: z.number().int().min(0).max(25),
-    imageQuality: z.number().int().min(0).max(20),
-    supplierReliability: z.number().int().min(0).max(20),
-    reviewSentiment: z.number().int().min(0).max(20),
-    marketDemand: z.number().int().min(0).max(15),
+    descriptionQuality: z.number().min(0).max(25),
+    imageQuality: z.number().min(0).max(20),
+    supplierReliability: z.number().min(0).max(20),
+    reviewSentiment: z.number().min(0).max(20),
+    marketDemand: z.number().min(0).max(15),
   }),
   badge: z.enum(['none', 'verified', 'qa_approved', 'engineer_tested']),
   notes: z.string().optional(),

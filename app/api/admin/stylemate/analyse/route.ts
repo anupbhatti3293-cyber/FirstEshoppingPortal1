@@ -57,26 +57,27 @@ export async function POST(request: NextRequest) {
     // ── Prompts ───────────────────────────────────────────────
     const titleSystem = `You are a conversion copywriter for LuxeHaven, a premium US/UK dropshipping store.
 Brand voice: luxurious, trustworthy, aspirational.
-Return ONLY valid JSON with no extra text: { "us": "<title max 70 chars>", "uk": "<title max 70 chars>" }
+Return ONLY a valid JSON object with no extra text:
+{ "us": "title for US market", "uk": "title for UK market" }
 Rules: Emotional hook + key feature + trust signal. No supplier names, no keyword stuffing.`;
 
     const descSystem = `You are a conversion copywriter for LuxeHaven, a premium US/UK dropshipping store.
-Return ONLY valid JSON with no extra text:
-{ "us": { "full": "<300-500 word description>", "short": "<under 100 words>" }, "uk": { "full": "<300-500 word description>", "short": "<under 100 words>" } }
-Structure: Hook → Problem solved → 3-5 benefits → Social proof angle → CTA.
+Return ONLY a valid JSON object with no extra text:
+{ "us": { "full": "300-500 word description", "short": "under 100 word summary" }, "uk": { "full": "300-500 word description", "short": "under 100 word summary" } }
+Structure: Hook → Problem solved → 3-5 benefits → Social proof → CTA.
 US: American English, lifestyle-forward. UK: British English (colour/favourite/organise), quality-focused.`;
 
     const seoSystem = `You are an SEO specialist for LuxeHaven, a premium US/UK dropshipping store.
-Return ONLY valid JSON with no extra text:
+Return ONLY a valid JSON object with no extra text:
 {
-  "us": { "metaTitle": "<max 60 chars>", "metaDescription": "<max 160 chars>", "tags": ["tag1","tag2","tag3","tag4","tag5"], "faq": [{"q":"question","a":"answer"},{"q":"question","a":"answer"},{"q":"question","a":"answer"},{"q":"question","a":"answer"},{"q":"question","a":"answer"}] },
-  "uk": { "metaTitle": "<max 60 chars>", "metaDescription": "<max 160 chars>", "tags": ["tag1","tag2","tag3","tag4","tag5"], "faq": [{"q":"question","a":"answer"},{"q":"question","a":"answer"},{"q":"question","a":"answer"},{"q":"question","a":"answer"},{"q":"question","a":"answer"}] }
+  "us": { "metaTitle": "max 60 chars", "metaDescription": "max 160 chars", "tags": ["tag1","tag2","tag3","tag4","tag5"], "faq": [{"q":"question","a":"answer"},{"q":"question","a":"answer"},{"q":"question","a":"answer"},{"q":"question","a":"answer"},{"q":"question","a":"answer"}] },
+  "uk": { "metaTitle": "max 60 chars", "metaDescription": "max 160 chars", "tags": ["tag1","tag2","tag3","tag4","tag5"], "faq": [{"q":"question","a":"answer"},{"q":"question","a":"answer"},{"q":"question","a":"answer"},{"q":"question","a":"answer"},{"q":"question","a":"answer"}] }
 }`;
 
     const qualitySystem = `You are a product quality analyst for LuxeHaven.
-Return ONLY valid JSON with no extra text:
-{ "score": 75, "breakdown": { "descriptionQuality": 18, "imageQuality": 15, "supplierReliability": 14, "reviewSentiment": 16, "marketDemand": 12 }, "badge": "qa_approved", "notes": "brief notes" }
-Badge thresholds: 0-49=none, 50-69=verified, 70-84=qa_approved, 85-100=engineer_tested.`;
+Return ONLY a valid JSON object with no extra text:
+{ "score": 75, "breakdown": { "descriptionQuality": 18, "imageQuality": 15, "supplierReliability": 14, "reviewSentiment": 16, "marketDemand": 12 }, "badge": "qa_approved", "notes": "brief notes here" }
+Badge rules: 0-49=none, 50-69=verified, 70-84=qa_approved, 85-100=engineer_tested.`;
 
     const base = `Product: ${product.name}
 Category: ${product.category}
@@ -92,11 +93,23 @@ Description: ${product.description ?? 'Not provided'}`;
       callAI(qualitySystem, `${base}\nImage count: ${imageCount}\nStock: ${product.stock_quantity}`, 600, provider),
     ]);
 
-    // Parse + validate
-    const titleData   = TitleOutputSchema.parse(parseAIJson<TitleOutput>(titleRaw));
-    const descData    = DescriptionOutputSchema.parse(parseAIJson<DescriptionOutput>(descRaw));
-    const seoData     = SeoOutputSchema.parse(parseAIJson<SeoOutput>(seoRaw));
-    const qualityData = QualityOutputSchema.parse(parseAIJson<QualityOutput>(qualityRaw));
+    // Parse with detailed error reporting per field
+    let titleData: TitleOutput;
+    let descData: DescriptionOutput;
+    let seoData: SeoOutput;
+    let qualityData: QualityOutput;
+
+    try { titleData = TitleOutputSchema.parse(parseAIJson<TitleOutput>(titleRaw)); }
+    catch (e) { throw new Error(`Title parse failed: ${e instanceof Error ? e.message : String(e)} | Raw: ${titleRaw.slice(0, 200)}`); }
+
+    try { descData = DescriptionOutputSchema.parse(parseAIJson<DescriptionOutput>(descRaw)); }
+    catch (e) { throw new Error(`Description parse failed: ${e instanceof Error ? e.message : String(e)} | Raw: ${descRaw.slice(0, 200)}`); }
+
+    try { seoData = SeoOutputSchema.parse(parseAIJson<SeoOutput>(seoRaw)); }
+    catch (e) { throw new Error(`SEO parse failed: ${e instanceof Error ? e.message : String(e)} | Raw: ${seoRaw.slice(0, 200)}`); }
+
+    try { qualityData = QualityOutputSchema.parse(parseAIJson<QualityOutput>(qualityRaw)); }
+    catch (e) { throw new Error(`Quality parse failed: ${e instanceof Error ? e.message : String(e)} | Raw: ${qualityRaw.slice(0, 200)}`); }
 
     const { error: upsertError } = await supabase
       .from('ai_product_analysis')
@@ -106,24 +119,24 @@ Description: ${product.description ?? 'Not provided'}`;
         ai_model: activeModel,
         prompt_version: PROMPT_VERSION,
         stylemate_status: 'completed',
-        ai_title_us: titleData.us,
-        ai_title_uk: titleData.uk,
-        ai_description_us: descData.us.full,
-        ai_description_uk: descData.uk.full,
-        ai_short_desc_us: descData.us.short,
-        ai_short_desc_uk: descData.uk.short,
-        ai_seo_title_us: seoData.us.metaTitle,
-        ai_seo_title_uk: seoData.uk.metaTitle,
-        ai_seo_desc_us: seoData.us.metaDescription,
-        ai_seo_desc_uk: seoData.uk.metaDescription,
-        ai_tags_us: seoData.us.tags,
-        ai_tags_uk: seoData.uk.tags,
-        ai_faq_us: seoData.us.faq,
-        ai_faq_uk: seoData.uk.faq,
-        quality_score: qualityData.score,
-        description_quality_score: qualityData.breakdown.descriptionQuality,
-        image_quality_score: qualityData.breakdown.imageQuality,
-        review_sentiment_score: qualityData.breakdown.reviewSentiment,
+        ai_title_us: titleData!.us,
+        ai_title_uk: titleData!.uk,
+        ai_description_us: descData!.us.full,
+        ai_description_uk: descData!.uk.full,
+        ai_short_desc_us: descData!.us.short,
+        ai_short_desc_uk: descData!.uk.short,
+        ai_seo_title_us: seoData!.us.metaTitle,
+        ai_seo_title_uk: seoData!.uk.metaTitle,
+        ai_seo_desc_us: seoData!.us.metaDescription,
+        ai_seo_desc_uk: seoData!.uk.metaDescription,
+        ai_tags_us: seoData!.us.tags,
+        ai_tags_uk: seoData!.uk.tags,
+        ai_faq_us: seoData!.us.faq,
+        ai_faq_uk: seoData!.uk.faq,
+        quality_score: qualityData!.score,
+        description_quality_score: qualityData!.breakdown.descriptionQuality,
+        image_quality_score: qualityData!.breakdown.imageQuality,
+        review_sentiment_score: qualityData!.breakdown.reviewSentiment,
       }, { onConflict: 'tenant_id,product_id' });
 
     if (upsertError) {
@@ -135,7 +148,12 @@ Description: ${product.description ?? 'Not provided'}`;
       success: true,
       productId,
       provider: activeModel,
-      result: { title: titleData, description: descData, seo: seoData, quality: qualityData },
+      result: {
+        title: titleData!,
+        description: descData!,
+        seo: seoData!,
+        quality: qualityData!,
+      },
     });
 
   } catch (err) {
