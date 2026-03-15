@@ -28,20 +28,24 @@ def publish_products_to_db(final_df: pd.DataFrame):
                 rating = _extract_rating(row.get('rating', 0))
                 margin_pct = 40.0
                 retail = cost * (1 + margin_pct / 100) if cost > 0 else 29.99
-                profit_score = min(100, int(rating * 20)) if rating else 50
+                profit_score = row.get('ai_profit_score')
+                if profit_score is None or (isinstance(profit_score, float) and pd.isna(profit_score)):
+                    profit_score = min(100, int(rating * 20)) if rating else 50
+                profit_score = int(round(float(profit_score)))
 
                 category = str(row.get('category', '')) or None
 
                 sql = text(f"""
                     INSERT INTO {table_name} 
-                    (tenant_id, supplier_id, external_id, raw_title, raw_description, processing_status, raw_images, raw_rating, supplier_price_usd, suggested_retail_price_usd, estimated_margin_pct, ai_profit_score, shipping_days_us, supplier_category)
+                    (tenant_id, supplier_id, external_id, raw_title, raw_description, processing_status, status, raw_images, raw_rating, supplier_price_usd, suggested_retail_price_usd, estimated_margin_pct, ai_profit_score, shipping_days_us, supplier_category)
                     VALUES 
-                    (:tid, 1, :ext_id, :title, :desc, 'AI_PROCESSED', :images, :rating, :cost, :retail, :margin, :score, 14, :cat)
+                    (:tid, 1, :ext_id, :title, :desc, 'AI_PROCESSED', 'pending_review', :images, :rating, :cost, :retail, :margin, :score, 14, :cat)
                     ON CONFLICT (tenant_id, supplier_id, external_id) DO UPDATE SET
                     raw_title = EXCLUDED.raw_title, raw_description = EXCLUDED.raw_description, raw_images = EXCLUDED.raw_images,
                     raw_rating = EXCLUDED.raw_rating, supplier_price_usd = EXCLUDED.supplier_price_usd,
                     suggested_retail_price_usd = EXCLUDED.suggested_retail_price_usd, estimated_margin_pct = EXCLUDED.estimated_margin_pct,
-                    ai_profit_score = EXCLUDED.ai_profit_score, supplier_category = EXCLUDED.supplier_category, processing_status = 'AI_PROCESSED'
+                    ai_profit_score = EXCLUDED.ai_profit_score, supplier_category = EXCLUDED.supplier_category,
+                    processing_status = 'AI_PROCESSED', status = 'pending_review'
                 """)
 
                 conn.execute(sql, {

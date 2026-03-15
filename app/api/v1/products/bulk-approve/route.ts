@@ -136,6 +136,7 @@ export async function POST(request: NextRequest) {
         .from('supplier_products')
         .update({
           processing_status: 'LIVE',
+          status: 'published',
           linked_product_id: productId,
           processed_at: new Date().toISOString(),
         })

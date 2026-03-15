@@ -2266,3 +2266,138 @@ connection to server at "aws-1-ap-northeast-1.pooler.supabase.com" (18.176.230.1
 2026-03-15 14:45:47,590 - ai.ai_generator - INFO - Successfully generated AI content for 'DANVOUY Womens T Shirt Casual Cotton Short'.
 2026-03-15 14:45:53,181 - db.db_publisher - INFO - Successfully staged 8 products.
 2026-03-15 14:45:56,875 - __main__ - INFO - Pipeline completed successfully!
+2026-03-15 22:08:25,672 - __main__ - INFO - Starting AI Dropshipping Pipeline...
+2026-03-15 22:08:25,672 - scrapers.data_scraper - INFO - Starting data fetching in MOCK mode.
+2026-03-15 22:08:25,673 - scrapers.clients.mock_client - INFO - Fetching mock data from URL: https://fakestoreapi.com/products
+2026-03-15 22:08:27,148 - scrapers.clients.mock_client - INFO - Successfully fetched 20 mock products.
+2026-03-15 22:08:27,150 - scrapers.data_scraper - INFO - Fetched 20 raw products.
+2026-03-15 22:08:27,150 - filters.data_filter - INFO - Starting product filtering and shortlisting process...
+2026-03-15 22:08:27,152 - filters.data_filter - INFO - Initial product count: 20
+2026-03-15 22:08:27,166 - filters.data_filter - INFO - Products after filtering: 8
+2026-03-15 22:08:27,171 - filters.data_filter - INFO - Final shortlist count: 8
+2026-03-15 22:08:27,171 - __main__ - INFO - Enhancing 8 products with Gemini AI...
+2026-03-15 22:08:27,172 - ai.ai_generator - INFO - Enhancing product: WD 4TB Gaming Drive Works with Playstation 4 Portable External Hard Drive
+2026-03-15 22:08:27,173 - ai.ai_generator - ERROR - Failed to enhance product 'WD 4TB Gaming Drive Works with Playstation 4 Portable External Hard Drive' with AI. Error: module 'google.genai' has no attribute 'configure'
+2026-03-15 22:08:27,173 - ai.ai_generator - INFO - Enhancing product: Silicon Power 256GB SSD 3D NAND A55 SLC Cache Performance Boost SATA III 2.5
+2026-03-15 22:08:27,173 - ai.ai_generator - ERROR - Failed to enhance product 'Silicon Power 256GB SSD 3D NAND A55 SLC Cache Performance Boost SATA III 2.5' with AI. Error: module 'google.genai' has no attribute 'configure'
+2026-03-15 22:08:27,174 - ai.ai_generator - INFO - Enhancing product: Mens Cotton Jacket
+2026-03-15 22:08:27,174 - ai.ai_generator - ERROR - Failed to enhance product 'Mens Cotton Jacket' with AI. Error: module 'google.genai' has no attribute 'configure'
+2026-03-15 22:08:27,174 - ai.ai_generator - INFO - Enhancing product: Mens Casual Premium Slim Fit T-Shirts 
+2026-03-15 22:08:27,174 - ai.ai_generator - ERROR - Failed to enhance product 'Mens Casual Premium Slim Fit T-Shirts ' with AI. Error: module 'google.genai' has no attribute 'configure'
+2026-03-15 22:08:27,175 - ai.ai_generator - INFO - Enhancing product: Solid Gold Petite Micropave 
+2026-03-15 22:08:27,175 - ai.ai_generator - ERROR - Failed to enhance product 'Solid Gold Petite Micropave ' with AI. Error: module 'google.genai' has no attribute 'configure'
+2026-03-15 22:08:27,175 - ai.ai_generator - INFO - Enhancing product: Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops
+2026-03-15 22:08:27,175 - ai.ai_generator - ERROR - Failed to enhance product 'Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops' with AI. Error: module 'google.genai' has no attribute 'configure'
+2026-03-15 22:08:27,176 - ai.ai_generator - INFO - Enhancing product: Rain Jacket Women Windbreaker Striped Climbing Raincoats
+2026-03-15 22:08:27,176 - ai.ai_generator - ERROR - Failed to enhance product 'Rain Jacket Women Windbreaker Striped Climbing Raincoats' with AI. Error: module 'google.genai' has no attribute 'configure'
+2026-03-15 22:08:27,176 - ai.ai_generator - INFO - Enhancing product: DANVOUY Womens T Shirt Casual Cotton Short
+2026-03-15 22:08:27,177 - ai.ai_generator - ERROR - Failed to enhance product 'DANVOUY Womens T Shirt Casual Cotton Short' with AI. Error: module 'google.genai' has no attribute 'configure'
+2026-03-15 22:08:27,177 - __main__ - ERROR - AI enhancement failed.
+2026-03-15 22:28:45,670 - __main__ - INFO - Starting AI Dropshipping Pipeline...
+2026-03-15 22:28:45,670 - scrapers.data_scraper - INFO - Starting data fetching in MOCK mode.
+2026-03-15 22:28:45,670 - scrapers.clients.mock_client - INFO - Fetching mock data from URL: https://fakestoreapi.com/products
+2026-03-15 22:28:47,238 - scrapers.clients.mock_client - INFO - Successfully fetched 20 mock products.
+2026-03-15 22:28:47,241 - scrapers.data_scraper - INFO - Fetched 20 raw products.
+2026-03-15 22:28:47,241 - filters.data_filter - INFO - Starting product filtering and shortlisting process...
+2026-03-15 22:28:47,244 - filters.data_filter - INFO - Initial product count: 20
+2026-03-15 22:28:47,251 - filters.data_filter - INFO - Products after filtering: 8
+2026-03-15 22:28:47,256 - filters.data_filter - INFO - Final shortlist count: 8
+2026-03-15 22:28:47,256 - __main__ - INFO - Enhancing 8 products with AI Orchestrator...
+2026-03-15 22:28:50,751 - ai.ai_generator - INFO - Enhancing product: WD 4TB Gaming Drive Works with Playstation 4 Portable External Hard Drive
+2026-03-15 22:28:58,620 - ai.ai_generator - INFO - Successfully generated AI content for 'WD 4TB Gaming Drive Works with Playstation 4 Portable External Hard Drive'.
+2026-03-15 22:28:58,620 - __main__ - INFO - Product: WD 4TB Gaming Drive Works with Playstati | math=40.9 market=10.0 final=58.6 | ai_title=WD 4TB Portable Gaming External Hard Dri
+2026-03-15 22:28:58,622 - ai.ai_generator - INFO - Enhancing product: Silicon Power 256GB SSD 3D NAND A55 SLC Cache Performance Boost SATA III 2.5
+2026-03-15 22:29:06,999 - ai.ai_generator - INFO - Successfully generated AI content for 'Silicon Power 256GB SSD 3D NAND A55 SLC Cache Performance Boost SATA III 2.5'.
+2026-03-15 22:29:07,000 - __main__ - INFO - Product: Silicon Power 256GB SSD 3D NAND A55 SLC  | math=40.9 market=10.0 final=58.6 | ai_title=Silicon Power Ace A55 256GB 3D NAND SATA
+2026-03-15 22:29:07,004 - ai.ai_generator - INFO - Enhancing product: Mens Cotton Jacket
+2026-03-15 22:29:16,358 - ai.ai_generator - INFO - Successfully generated AI content for 'Mens Cotton Jacket'.
+2026-03-15 22:29:16,358 - __main__ - INFO - Product: Mens Cotton Jacket | math=40.1 market=10.0 final=58.1 | ai_title=Men's Versatile Cotton Outdoor Jacket | 
+2026-03-15 22:29:16,360 - ai.ai_generator - INFO - Enhancing product: Mens Casual Premium Slim Fit T-Shirts 
+2026-03-15 22:29:26,254 - ai.ai_generator - INFO - Successfully generated AI content for 'Mens Casual Premium Slim Fit T-Shirts '.
+2026-03-15 22:29:26,255 - __main__ - INFO - Product: Mens Casual Premium Slim Fit T-Shirts  | math=35.9 market=10.0 final=55.1 | ai_title=Men's Premium Slim Fit Henley T-Shirt | 
+2026-03-15 22:29:26,257 - ai.ai_generator - INFO - Enhancing product: Solid Gold Petite Micropave 
+2026-03-15 22:29:33,781 - ai.ai_generator - INFO - Successfully generated AI content for 'Solid Gold Petite Micropave '.
+2026-03-15 22:29:33,781 - __main__ - INFO - Product: Solid Gold Petite Micropave  | math=34.6 market=10.0 final=54.2 | ai_title=Solid Gold Petite Micropave Ring | Daint
+2026-03-15 22:29:33,785 - ai.ai_generator - INFO - Enhancing product: Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops
+2026-03-15 22:29:41,926 - ai.ai_generator - INFO - Successfully generated AI content for 'Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops'.
+2026-03-15 22:29:41,927 - __main__ - INFO - Product: Fjallraven - Foldsack No. 1 Backpack, Fi | math=34.6 market=10.0 final=54.2 | ai_title=Fjallraven Foldsack No. 1 Backpack: Dura
+2026-03-15 22:29:41,930 - ai.ai_generator - INFO - Enhancing product: Rain Jacket Women Windbreaker Striped Climbing Raincoats
+2026-03-15 22:29:48,710 - ai.ai_generator - INFO - Successfully generated AI content for 'Rain Jacket Women Windbreaker Striped Climbing Raincoats'.
+2026-03-15 22:29:48,710 - __main__ - INFO - Product: Rain Jacket Women Windbreaker Striped Cl | math=34.0 market=10.0 final=53.8 | ai_title=Women's Lightweight Waterproof Rain Jack
+2026-03-15 22:29:48,711 - ai.ai_generator - INFO - Enhancing product: DANVOUY Womens T Shirt Casual Cotton Short
+2026-03-15 22:29:55,184 - ai.ai_generator - INFO - Successfully generated AI content for 'DANVOUY Womens T Shirt Casual Cotton Short'.
+2026-03-15 22:29:55,185 - __main__ - INFO - Product: DANVOUY Womens T Shirt Casual Cotton Sho | math=32.8 market=10.0 final=53.0 | ai_title=DANVOUY Women's V-Neck Letter Print T-Sh
+2026-03-15 22:29:59,638 - db.db_publisher - INFO - Successfully staged 8 products.
+2026-03-15 22:30:02,937 - __main__ - INFO - Pipeline completed successfully!
+2026-03-15 22:31:03,411 - __main__ - INFO - Starting AI Dropshipping Pipeline...
+2026-03-15 22:31:03,411 - scrapers.data_scraper - INFO - Starting data fetching in MOCK mode.
+2026-03-15 22:31:03,411 - scrapers.clients.mock_client - INFO - Fetching mock data from URL: https://fakestoreapi.com/products
+2026-03-15 22:31:04,064 - scrapers.clients.mock_client - INFO - Successfully fetched 20 mock products.
+2026-03-15 22:31:04,065 - scrapers.data_scraper - INFO - Fetched 20 raw products.
+2026-03-15 22:31:04,065 - filters.data_filter - INFO - Starting product filtering and shortlisting process...
+2026-03-15 22:31:04,067 - filters.data_filter - INFO - Initial product count: 20
+2026-03-15 22:31:04,069 - filters.data_filter - INFO - Products after filtering: 8
+2026-03-15 22:31:04,071 - filters.data_filter - INFO - Final shortlist count: 8
+2026-03-15 22:31:04,072 - __main__ - INFO - Enhancing 8 products with AI Orchestrator...
+2026-03-15 22:31:08,170 - ai.ai_generator - INFO - Enhancing product: WD 4TB Gaming Drive Works with Playstation 4 Portable External Hard Drive
+2026-03-15 22:31:16,711 - ai.ai_generator - INFO - Successfully generated AI content for 'WD 4TB Gaming Drive Works with Playstation 4 Portable External Hard Drive'.
+2026-03-15 22:31:16,712 - __main__ - INFO - Product: WD 4TB Gaming Drive Works with Playstati | math=40.9 market=10.0 final=58.6 | ai_title=WD 4TB Gaming Drive for PS4 - Portable E
+2026-03-15 22:31:16,716 - ai.ai_generator - INFO - Enhancing product: Silicon Power 256GB SSD 3D NAND A55 SLC Cache Performance Boost SATA III 2.5
+2026-03-15 22:31:23,295 - ai.ai_generator - INFO - Successfully generated AI content for 'Silicon Power 256GB SSD 3D NAND A55 SLC Cache Performance Boost SATA III 2.5'.
+2026-03-15 22:31:23,295 - __main__ - INFO - Product: Silicon Power 256GB SSD 3D NAND A55 SLC  | math=40.9 market=10.0 final=58.6 | ai_title=Silicon Power 256GB A55 SSD 2.5" SATA II
+2026-03-15 22:31:23,298 - ai.ai_generator - INFO - Enhancing product: Mens Cotton Jacket
+2026-03-15 22:31:31,685 - ai.ai_generator - INFO - Successfully generated AI content for 'Mens Cotton Jacket'.
+2026-03-15 22:31:31,686 - __main__ - INFO - Product: Mens Cotton Jacket | math=40.1 market=10.0 final=58.1 | ai_title=Men's Versatile Cotton Outdoor Jacket - 
+2026-03-15 22:31:31,688 - ai.ai_generator - INFO - Enhancing product: Mens Casual Premium Slim Fit T-Shirts 
+2026-03-15 22:31:37,793 - ai.ai_generator - INFO - Successfully generated AI content for 'Mens Casual Premium Slim Fit T-Shirts '.
+2026-03-15 22:31:37,794 - __main__ - INFO - Product: Mens Casual Premium Slim Fit T-Shirts  | math=35.9 market=10.0 final=55.1 | ai_title=Men's Premium Slim Fit Henley Raglan Lon
+2026-03-15 22:31:37,797 - ai.ai_generator - INFO - Enhancing product: Solid Gold Petite Micropave 
+2026-03-15 22:31:47,025 - ai.ai_generator - INFO - Successfully generated AI content for 'Solid Gold Petite Micropave '.
+2026-03-15 22:31:47,025 - __main__ - INFO - Product: Solid Gold Petite Micropave  | math=34.6 market=10.0 final=54.2 | ai_title=Solid Gold Petite Micropave Ring | Delic
+2026-03-15 22:31:47,027 - ai.ai_generator - INFO - Enhancing product: Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops
+2026-03-15 22:31:55,155 - ai.ai_generator - INFO - Successfully generated AI content for 'Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops'.
+2026-03-15 22:31:55,155 - __main__ - INFO - Product: Fjallraven - Foldsack No. 1 Backpack, Fi | math=34.6 market=10.0 final=54.2 | ai_title=Fjallraven Foldsack No. 1 Backpack: Dura
+2026-03-15 22:31:55,157 - ai.ai_generator - INFO - Enhancing product: Rain Jacket Women Windbreaker Striped Climbing Raincoats
+2026-03-15 22:32:03,759 - ai.ai_generator - INFO - Successfully generated AI content for 'Rain Jacket Women Windbreaker Striped Climbing Raincoats'.
+2026-03-15 22:32:03,759 - __main__ - INFO - Product: Rain Jacket Women Windbreaker Striped Cl | math=34.0 market=10.0 final=53.8 | ai_title=Women's Lightweight Striped Rain Jacket 
+2026-03-15 22:32:03,760 - ai.ai_generator - INFO - Enhancing product: DANVOUY Womens T Shirt Casual Cotton Short
+2026-03-15 22:32:11,643 - ai.ai_generator - INFO - Successfully generated AI content for 'DANVOUY Womens T Shirt Casual Cotton Short'.
+2026-03-15 22:32:11,644 - __main__ - INFO - Product: DANVOUY Womens T Shirt Casual Cotton Sho | math=32.8 market=10.0 final=53.0 | ai_title=Women's V-Neck Short Sleeve T-Shirt | So
+2026-03-15 22:32:16,109 - db.db_publisher - INFO - Successfully staged 8 products.
+2026-03-15 22:32:19,322 - __main__ - INFO - Pipeline completed successfully!
+2026-03-15 22:35:38,540 - __main__ - INFO - Starting AI Dropshipping Pipeline...
+2026-03-15 22:35:38,541 - scrapers.data_scraper - INFO - Starting data fetching in MOCK mode.
+2026-03-15 22:35:38,541 - scrapers.clients.mock_client - INFO - Fetching mock data from URL: https://fakestoreapi.com/products
+2026-03-15 22:35:40,086 - scrapers.clients.mock_client - INFO - Successfully fetched 20 mock products.
+2026-03-15 22:35:40,090 - scrapers.data_scraper - INFO - Fetched 20 raw products.
+2026-03-15 22:35:40,090 - filters.data_filter - INFO - Starting product filtering and shortlisting process...
+2026-03-15 22:35:40,093 - filters.data_filter - INFO - Initial product count: 20
+2026-03-15 22:35:40,098 - filters.data_filter - INFO - Products after filtering: 8
+2026-03-15 22:35:40,101 - filters.data_filter - INFO - Final shortlist count: 8
+2026-03-15 22:35:40,102 - __main__ - INFO - Enhancing 8 products with AI Orchestrator...
+2026-03-15 22:35:43,565 - ai.ai_generator - INFO - Enhancing product: WD 4TB Gaming Drive Works with Playstation 4 Portable External Hard Drive
+2026-03-15 22:35:51,419 - ai.ai_generator - INFO - Successfully generated AI content for 'WD 4TB Gaming Drive Works with Playstation 4 Portable External Hard Drive'.
+2026-03-15 22:35:51,420 - __main__ - INFO - Product: WD 4TB Gaming Drive Works with Playstati | math=40.9 market=10.0 final=58.6 | ai_title=WD 4TB Gaming Drive for PlayStation 4 (P
+2026-03-15 22:35:51,423 - ai.ai_generator - INFO - Enhancing product: Silicon Power 256GB SSD 3D NAND A55 SLC Cache Performance Boost SATA III 2.5
+2026-03-15 22:35:59,139 - ai.ai_generator - INFO - Successfully generated AI content for 'Silicon Power 256GB SSD 3D NAND A55 SLC Cache Performance Boost SATA III 2.5'.
+2026-03-15 22:35:59,140 - __main__ - INFO - Product: Silicon Power 256GB SSD 3D NAND A55 SLC  | math=40.9 market=10.0 final=58.6 | ai_title=Silicon Power Ace A55 256GB SSD SATA III
+2026-03-15 22:35:59,144 - ai.ai_generator - INFO - Enhancing product: Mens Cotton Jacket
+2026-03-15 22:36:07,410 - ai.ai_generator - INFO - Successfully generated AI content for 'Mens Cotton Jacket'.
+2026-03-15 22:36:07,411 - __main__ - INFO - Product: Mens Cotton Jacket | math=40.1 market=10.0 final=58.1 | ai_title=Men's Premium Cotton Outdoor Jacket | Ve
+2026-03-15 22:36:07,413 - ai.ai_generator - INFO - Enhancing product: Mens Casual Premium Slim Fit T-Shirts 
+2026-03-15 22:36:13,623 - ai.ai_generator - INFO - Successfully generated AI content for 'Mens Casual Premium Slim Fit T-Shirts '.
+2026-03-15 22:36:13,623 - __main__ - INFO - Product: Mens Casual Premium Slim Fit T-Shirts  | math=35.9 market=10.0 final=55.1 | ai_title=Men's Premium Slim Fit Henley T-Shirt - 
+2026-03-15 22:36:13,626 - ai.ai_generator - INFO - Enhancing product: Solid Gold Petite Micropave 
+2026-03-15 22:36:23,771 - ai.ai_generator - INFO - Successfully generated AI content for 'Solid Gold Petite Micropave '.
+2026-03-15 22:36:23,771 - __main__ - INFO - Product: Solid Gold Petite Micropave  | math=34.6 market=10.0 final=54.2 | ai_title=Solid Gold Petite Micropave Jewelry | Da
+2026-03-15 22:36:23,772 - ai.ai_generator - INFO - Enhancing product: Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops
+2026-03-15 22:36:32,145 - ai.ai_generator - INFO - Successfully generated AI content for 'Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops'.
+2026-03-15 22:36:32,146 - __main__ - INFO - Product: Fjallraven - Foldsack No. 1 Backpack, Fi | math=34.6 market=10.0 final=54.2 | ai_title=Fjallraven Foldsack No. 1 Backpack | Dur
+2026-03-15 22:36:32,147 - ai.ai_generator - INFO - Enhancing product: Rain Jacket Women Windbreaker Striped Climbing Raincoats
+2026-03-15 22:36:41,257 - ai.ai_generator - INFO - Successfully generated AI content for 'Rain Jacket Women Windbreaker Striped Climbing Raincoats'.
+2026-03-15 22:36:41,258 - __main__ - INFO - Product: Rain Jacket Women Windbreaker Striped Cl | math=34.0 market=10.0 final=53.8 | ai_title=Women's Striped Lightweight Rain Jacket 
+2026-03-15 22:36:41,261 - ai.ai_generator - INFO - Enhancing product: DANVOUY Womens T Shirt Casual Cotton Short
+2026-03-15 22:36:47,482 - ai.ai_generator - INFO - Successfully generated AI content for 'DANVOUY Womens T Shirt Casual Cotton Short'.
+2026-03-15 22:36:47,482 - __main__ - INFO - Product: DANVOUY Womens T Shirt Casual Cotton Sho | math=32.8 market=10.0 final=53.0 | ai_title=DANVOUY Women's V-Neck Short Sleeve T-Sh
+2026-03-15 22:36:52,171 - db.db_publisher - INFO - Successfully staged 8 products.
+2026-03-15 22:36:55,309 - __main__ - INFO - Pipeline completed successfully!
