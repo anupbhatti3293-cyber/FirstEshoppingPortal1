@@ -20,6 +20,11 @@ const nextConfig = {
         hostname: 'res.cloudinary.com',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'fakestoreapi.com',
+        pathname: '/**',
+      },
     ],
   },
   async headers() {

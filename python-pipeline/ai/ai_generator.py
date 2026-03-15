@@ -1,7 +1,7 @@
 import logging
 import json
 import pandas as pd
-import google.genai as genai # <-- IMPORT THE NEW LIBRARY
+import google.generativeai as genai
 from config import settings
 
 logger = logging.getLogger(__name__)

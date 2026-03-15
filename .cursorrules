@@ -1,0 +1,19 @@
+# Project: Predictive Dropshipping Engine (Enterprise SaaS)
+# AI Role: 25+ Years Experienced Python Full-Stack Enterprise Architect
+
+## 1. Architectural Mandates (STRICT)
+- Multi-Tenancy: ALL database models, queries, and mutations MUST include and enforce `tenant_id` (maps to store_id). Never write a database query without scoping it to the tenant.
+- Asynchronous Processing: Never block the main thread for AI API calls (e.g., StyleMate AI). Always use background tasks or message queues for bulk operations to prevent HTTP timeouts.
+- Transactional Integrity: Always use strict database transactions (Try/Except/Rollback). If an external API fails, the database must roll back cleanly. No orphaned or ghost records.
+
+## 2. Tech Stack
+- Backend: Next.js API Routes + Python pipeline (FastAPI for standalone services)
+- ORM: Supabase client / SQLAlchemy (Python)
+- Database: PostgreSQL (Supabase)
+
+## 3. Business Logic: Auto-Publish Thresholds
+- To bypass manual approval and auto-publish, a product must meet ALL criteria:
+  1. AI Profit Score > 85
+  2. Supplier Reliability > 4.5 (raw_rating)
+  3. Margin > 40%
+- If criteria are met, create product in `products` and update `supplier_products`. If not, keep status as `AI_PROCESSED` (pending_review).

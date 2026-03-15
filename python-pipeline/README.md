@@ -1,57 +1,59 @@
-# LuxeHaven AI Pipeline — Setup Guide
+# LuxeHaven AI Pipeline — Trending Products Automation
 
-## Prerequisites
-- Python 3.11+
-- pip
-- Access to Supabase project (same as Next.js app)
-- Gemini API key (billing-enabled Google project)
+Automated Python pipeline that fetches products, filters by trending logic, enhances with Gemini AI, and publishes to Supabase.
 
-## Setup
+## Quick Start
+
+### 1. Install dependencies
 
 ```bash
-# 1. Navigate to the pipeline folder
 cd python-pipeline
-
-# 2. Create a virtual environment
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-
-# 3. Install dependencies
 pip install -r requirements.txt
-
-# 4. Create your .env file
-cp .env.example .env
-# Edit .env with your actual values
-
-# 5. Run in mock mode (safe — no real API calls)
-MOCK_MODE=true python main_pipeline.py
-
-# 6. Dry run (test everything except DB write)
-python main_pipeline.py --dry-run
-
-# 7. Full run (requires real API keys)
-MOCK_MODE=false python main_pipeline.py
 ```
 
-## Build Order
+### 2. Configure environment
 
-Build and test each module before moving to the next:
+Copy `.env.example` to `.env` and set:
 
-1. `config.py` — central config loader
-2. `scrapers/data_scraper.py` — fetch products
-3. `processing/data_filter.py` — filter and score
-4. `ai/ai_content_generator.py` — AI enrichment
-5. `database/db_publisher.py` — DB writes
-6. `main_pipeline.py` — master controller
+- `SUPABASE_DB_POOLER_URL` or `DB_SQLALCHEMY_URI` — Supabase connection string  
+  **If your password contains `#` or `@`**, URL-encode them: `#` → `%23`, `@` → `%40`
+- `GEMINI_API_KEY` — Get at [Google AI Studio](https://aistudio.google.com/apikey)
 
-## Running on a Schedule
+You can also use the project root `.env` (Next.js app) — the pipeline loads from both.
 
-See `ARCHITECTURE.md` Section 8 for GitHub Actions cron setup (recommended).
+### 3. Run the pipeline
 
-## Viewing Results
+**From project root:**
 
-After a pipeline run, view staged products in:
-`http://localhost:3000/admin/suppliers/staged`
+```bash
+py -3.11 python-pipeline\main_pipeline.py
+```
 
-View run logs in:
-`http://localhost:3000/admin/suppliers/pipeline-logs`
+**Or use the batch script (Windows):**
+
+```bash
+python-pipeline\run_pipeline.bat
+```
+
+## Pipeline flow
+
+1. **Scrape** — Fetches products from mock API (fakestoreapi.com) or live suppliers
+2. **Filter** — Applies min rating, price range, category filters; shortlists top N by rating
+3. **AI Enhance** — Uses Gemini 2.5 Flash to generate SEO-friendly titles and descriptions
+4. **Publish** — Inserts into `supplier_products` table in Supabase
+
+## Configuration
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `run_mode` | MOCK | MOCK = fakestoreapi, LIVE = real suppliers |
+| `max_shortlist` | 10 | Max products to AI-enhance and publish |
+| `min_rating` | 3.5 | Minimum product rating filter |
+| `price_min_usd` / `price_max_usd` | 10–500 | Price range filter |
+| `GEMINI_MODEL` | gemini-2.5-flash | AI model for enhancements |
+
+## Troubleshooting
+
+- **`module 'google.genai' has no attribute 'configure'`** — Use `google.generativeai` (fixed in this codebase)
+- **`models/gemini-pro is not found`** — Use `gemini-2.5-flash` (deprecated models removed)
+- **`could not translate host name`** — Password has `#` or `@`; URL-encode in `.env`

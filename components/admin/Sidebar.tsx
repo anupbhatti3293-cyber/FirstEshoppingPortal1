@@ -17,6 +17,7 @@ import {
   X,
   Tag,
   ShoppingBag,
+  Target,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -29,6 +30,7 @@ const NAV_ITEMS = [
   { href: '/admin/customers',       icon: Users,           label: 'Customers' },
   { href: '/admin/suppliers',       icon: Truck,           label: 'Suppliers' },
   { href: '/admin/stylemate',       icon: Sparkles,        label: 'StyleMate AI' },
+  { href: '/admin/trend-radar',     icon: Target,          label: 'Trend Radar' },
   { href: '/admin/analytics',       icon: BarChart3,       label: 'Analytics' },
   { href: '/admin/settings',        icon: Settings,        label: 'Settings' },
 ];

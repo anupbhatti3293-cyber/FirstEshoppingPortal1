@@ -1947,3 +1947,322 @@ google.api_core.exceptions.NotFound: 404 models/gemini-1.0-pro is not found for 
 2026-03-15 09:24:28,306 - ai.ai_generator - INFO - Enhancing product: DANVOUY Womens T Shirt Casual Cotton Short
 2026-03-15 09:24:28,314 - ai.ai_generator - ERROR - Failed to enhance product 'DANVOUY Womens T Shirt Casual Cotton Short' with AI. Error: module 'google.genai' has no attribute 'configure'
 2026-03-15 09:24:28,314 - __main__ - ERROR - AI enhancement failed.
+2026-03-15 10:47:49,781 - __main__ - INFO - Starting AI Dropshipping Pipeline...
+2026-03-15 10:47:49,781 - scrapers.data_scraper - INFO - Starting data fetching in MOCK mode.
+2026-03-15 10:47:49,781 - scrapers.clients.mock_client - INFO - Fetching mock data from URL: https://fakestoreapi.com/products
+2026-03-15 10:47:51,377 - scrapers.clients.mock_client - INFO - Successfully fetched 20 mock products.
+2026-03-15 10:47:51,380 - scrapers.data_scraper - INFO - Fetched 20 raw products.
+2026-03-15 10:47:51,380 - filters.data_filter - INFO - Starting product filtering and shortlisting process...
+2026-03-15 10:47:51,383 - filters.data_filter - INFO - Initial product count: 20
+2026-03-15 10:47:51,385 - filters.data_filter - INFO - Products after filtering: 8
+2026-03-15 10:47:51,385 - filters.data_filter - INFO - Final shortlist count: 8
+2026-03-15 10:47:51,385 - __main__ - INFO - Enhancing 8 products with Gemini AI...
+2026-03-15 10:47:51,385 - ai.ai_generator - INFO - Enhancing product: Silicon Power 256GB SSD 3D NAND A55 SLC Cache Performance Boost SATA III 2.5
+2026-03-15 10:47:51,385 - ai.ai_generator - ERROR - Failed to enhance product 'Silicon Power 256GB SSD 3D NAND A55 SLC Cache Performance Boost SATA III 2.5' with AI. Error: module 'google.genai' has no attribute 'configure'
+2026-03-15 10:47:51,385 - ai.ai_generator - INFO - Enhancing product: WD 4TB Gaming Drive Works with Playstation 4 Portable External Hard Drive
+2026-03-15 10:47:51,385 - ai.ai_generator - ERROR - Failed to enhance product 'WD 4TB Gaming Drive Works with Playstation 4 Portable External Hard Drive' with AI. Error: module 'google.genai' has no attribute 'configure'
+2026-03-15 10:47:51,385 - ai.ai_generator - INFO - Enhancing product: Mens Cotton Jacket
+2026-03-15 10:47:51,385 - ai.ai_generator - ERROR - Failed to enhance product 'Mens Cotton Jacket' with AI. Error: module 'google.genai' has no attribute 'configure'
+2026-03-15 10:47:51,385 - ai.ai_generator - INFO - Enhancing product: Mens Casual Premium Slim Fit T-Shirts 
+2026-03-15 10:47:51,387 - ai.ai_generator - ERROR - Failed to enhance product 'Mens Casual Premium Slim Fit T-Shirts ' with AI. Error: module 'google.genai' has no attribute 'configure'
+2026-03-15 10:47:51,387 - ai.ai_generator - INFO - Enhancing product: Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops
+2026-03-15 10:47:51,387 - ai.ai_generator - ERROR - Failed to enhance product 'Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops' with AI. Error: module 'google.genai' has no attribute 'configure'
+2026-03-15 10:47:51,387 - ai.ai_generator - INFO - Enhancing product: Solid Gold Petite Micropave 
+2026-03-15 10:47:51,387 - ai.ai_generator - ERROR - Failed to enhance product 'Solid Gold Petite Micropave ' with AI. Error: module 'google.genai' has no attribute 'configure'
+2026-03-15 10:47:51,387 - ai.ai_generator - INFO - Enhancing product: Rain Jacket Women Windbreaker Striped Climbing Raincoats
+2026-03-15 10:47:51,387 - ai.ai_generator - ERROR - Failed to enhance product 'Rain Jacket Women Windbreaker Striped Climbing Raincoats' with AI. Error: module 'google.genai' has no attribute 'configure'
+2026-03-15 10:47:51,387 - ai.ai_generator - INFO - Enhancing product: DANVOUY Womens T Shirt Casual Cotton Short
+2026-03-15 10:47:51,387 - ai.ai_generator - ERROR - Failed to enhance product 'DANVOUY Womens T Shirt Casual Cotton Short' with AI. Error: module 'google.genai' has no attribute 'configure'
+2026-03-15 10:47:51,387 - __main__ - ERROR - AI enhancement failed.
+2026-03-15 10:48:40,548 - __main__ - INFO - Starting AI Dropshipping Pipeline...
+2026-03-15 10:48:40,548 - scrapers.data_scraper - INFO - Starting data fetching in MOCK mode.
+2026-03-15 10:48:40,548 - scrapers.clients.mock_client - INFO - Fetching mock data from URL: https://fakestoreapi.com/products
+2026-03-15 10:48:41,147 - scrapers.clients.mock_client - INFO - Successfully fetched 20 mock products.
+2026-03-15 10:48:41,147 - scrapers.data_scraper - INFO - Fetched 20 raw products.
+2026-03-15 10:48:41,147 - filters.data_filter - INFO - Starting product filtering and shortlisting process...
+2026-03-15 10:48:41,161 - filters.data_filter - INFO - Initial product count: 20
+2026-03-15 10:48:41,164 - filters.data_filter - INFO - Products after filtering: 8
+2026-03-15 10:48:41,164 - filters.data_filter - INFO - Final shortlist count: 8
+2026-03-15 10:48:41,164 - __main__ - INFO - Enhancing 8 products with Gemini AI...
+2026-03-15 10:48:41,164 - ai.ai_generator - INFO - Enhancing product: Silicon Power 256GB SSD 3D NAND A55 SLC Cache Performance Boost SATA III 2.5
+2026-03-15 10:48:41,713 - ai.ai_generator - ERROR - Failed to enhance product 'Silicon Power 256GB SSD 3D NAND A55 SLC Cache Performance Boost SATA III 2.5' with AI. Error: 404 models/gemini-pro is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+2026-03-15 10:48:41,713 - ai.ai_generator - INFO - Enhancing product: WD 4TB Gaming Drive Works with Playstation 4 Portable External Hard Drive
+2026-03-15 10:48:42,111 - ai.ai_generator - ERROR - Failed to enhance product 'WD 4TB Gaming Drive Works with Playstation 4 Portable External Hard Drive' with AI. Error: 404 models/gemini-pro is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+2026-03-15 10:48:42,111 - ai.ai_generator - INFO - Enhancing product: Mens Cotton Jacket
+2026-03-15 10:48:42,480 - ai.ai_generator - ERROR - Failed to enhance product 'Mens Cotton Jacket' with AI. Error: 404 models/gemini-pro is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+2026-03-15 10:48:42,480 - ai.ai_generator - INFO - Enhancing product: Mens Casual Premium Slim Fit T-Shirts 
+2026-03-15 10:48:42,869 - ai.ai_generator - ERROR - Failed to enhance product 'Mens Casual Premium Slim Fit T-Shirts ' with AI. Error: 404 models/gemini-pro is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+2026-03-15 10:48:42,869 - ai.ai_generator - INFO - Enhancing product: Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops
+2026-03-15 10:48:43,230 - ai.ai_generator - ERROR - Failed to enhance product 'Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops' with AI. Error: 404 models/gemini-pro is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+2026-03-15 10:48:43,230 - ai.ai_generator - INFO - Enhancing product: Solid Gold Petite Micropave 
+2026-03-15 10:48:43,598 - ai.ai_generator - ERROR - Failed to enhance product 'Solid Gold Petite Micropave ' with AI. Error: 404 models/gemini-pro is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+2026-03-15 10:48:43,610 - ai.ai_generator - INFO - Enhancing product: Rain Jacket Women Windbreaker Striped Climbing Raincoats
+2026-03-15 10:48:43,979 - ai.ai_generator - ERROR - Failed to enhance product 'Rain Jacket Women Windbreaker Striped Climbing Raincoats' with AI. Error: 404 models/gemini-pro is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+2026-03-15 10:48:43,979 - ai.ai_generator - INFO - Enhancing product: DANVOUY Womens T Shirt Casual Cotton Short
+2026-03-15 10:48:44,359 - ai.ai_generator - ERROR - Failed to enhance product 'DANVOUY Womens T Shirt Casual Cotton Short' with AI. Error: 404 models/gemini-pro is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+2026-03-15 10:48:44,359 - __main__ - ERROR - AI enhancement failed.
+2026-03-15 10:48:54,839 - __main__ - INFO - Starting AI Dropshipping Pipeline...
+2026-03-15 10:48:54,839 - scrapers.data_scraper - INFO - Starting data fetching in MOCK mode.
+2026-03-15 10:48:54,839 - scrapers.clients.mock_client - INFO - Fetching mock data from URL: https://fakestoreapi.com/products
+2026-03-15 10:48:55,457 - scrapers.clients.mock_client - INFO - Successfully fetched 20 mock products.
+2026-03-15 10:48:55,457 - scrapers.data_scraper - INFO - Fetched 20 raw products.
+2026-03-15 10:48:55,457 - filters.data_filter - INFO - Starting product filtering and shortlisting process...
+2026-03-15 10:48:55,457 - filters.data_filter - INFO - Initial product count: 20
+2026-03-15 10:48:55,457 - filters.data_filter - INFO - Products after filtering: 8
+2026-03-15 10:48:55,457 - filters.data_filter - INFO - Final shortlist count: 8
+2026-03-15 10:48:55,457 - __main__ - INFO - Enhancing 8 products with Gemini AI...
+2026-03-15 10:48:55,472 - ai.ai_generator - INFO - Enhancing product: Silicon Power 256GB SSD 3D NAND A55 SLC Cache Performance Boost SATA III 2.5
+2026-03-15 10:48:55,895 - ai.ai_generator - ERROR - Failed to enhance product 'Silicon Power 256GB SSD 3D NAND A55 SLC Cache Performance Boost SATA III 2.5' with AI. Error: 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+2026-03-15 10:48:55,895 - ai.ai_generator - INFO - Enhancing product: WD 4TB Gaming Drive Works with Playstation 4 Portable External Hard Drive
+2026-03-15 10:48:56,290 - ai.ai_generator - ERROR - Failed to enhance product 'WD 4TB Gaming Drive Works with Playstation 4 Portable External Hard Drive' with AI. Error: 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+2026-03-15 10:48:56,290 - ai.ai_generator - INFO - Enhancing product: Mens Cotton Jacket
+2026-03-15 10:48:56,724 - ai.ai_generator - ERROR - Failed to enhance product 'Mens Cotton Jacket' with AI. Error: 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+2026-03-15 10:48:56,724 - ai.ai_generator - INFO - Enhancing product: Mens Casual Premium Slim Fit T-Shirts 
+2026-03-15 10:48:57,124 - ai.ai_generator - ERROR - Failed to enhance product 'Mens Casual Premium Slim Fit T-Shirts ' with AI. Error: 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+2026-03-15 10:48:57,124 - ai.ai_generator - INFO - Enhancing product: Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops
+2026-03-15 10:48:57,572 - ai.ai_generator - ERROR - Failed to enhance product 'Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops' with AI. Error: 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+2026-03-15 10:48:57,572 - ai.ai_generator - INFO - Enhancing product: Solid Gold Petite Micropave 
+2026-03-15 10:48:57,956 - ai.ai_generator - ERROR - Failed to enhance product 'Solid Gold Petite Micropave ' with AI. Error: 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+2026-03-15 10:48:57,956 - ai.ai_generator - INFO - Enhancing product: Rain Jacket Women Windbreaker Striped Climbing Raincoats
+2026-03-15 10:48:58,406 - ai.ai_generator - ERROR - Failed to enhance product 'Rain Jacket Women Windbreaker Striped Climbing Raincoats' with AI. Error: 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+2026-03-15 10:48:58,406 - ai.ai_generator - INFO - Enhancing product: DANVOUY Womens T Shirt Casual Cotton Short
+2026-03-15 10:48:58,805 - ai.ai_generator - ERROR - Failed to enhance product 'DANVOUY Womens T Shirt Casual Cotton Short' with AI. Error: 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+2026-03-15 10:48:58,805 - __main__ - ERROR - AI enhancement failed.
+2026-03-15 10:49:44,213 - __main__ - INFO - Starting AI Dropshipping Pipeline...
+2026-03-15 10:49:44,214 - scrapers.data_scraper - INFO - Starting data fetching in MOCK mode.
+2026-03-15 10:49:44,214 - scrapers.clients.mock_client - INFO - Fetching mock data from URL: https://fakestoreapi.com/products
+2026-03-15 10:49:44,794 - scrapers.clients.mock_client - INFO - Successfully fetched 20 mock products.
+2026-03-15 10:49:44,794 - scrapers.data_scraper - INFO - Fetched 20 raw products.
+2026-03-15 10:49:44,794 - filters.data_filter - INFO - Starting product filtering and shortlisting process...
+2026-03-15 10:49:44,794 - filters.data_filter - INFO - Initial product count: 20
+2026-03-15 10:49:44,794 - filters.data_filter - INFO - Products after filtering: 8
+2026-03-15 10:49:44,794 - filters.data_filter - INFO - Final shortlist count: 8
+2026-03-15 10:49:44,794 - __main__ - INFO - Enhancing 8 products with Gemini AI...
+2026-03-15 10:49:44,794 - ai.ai_generator - INFO - Enhancing product: Silicon Power 256GB SSD 3D NAND A55 SLC Cache Performance Boost SATA III 2.5
+2026-03-15 10:49:45,310 - ai.ai_generator - ERROR - Failed to enhance product 'Silicon Power 256GB SSD 3D NAND A55 SLC Cache Performance Boost SATA III 2.5' with AI. Error: 404 This model models/gemini-2.0-flash is no longer available to new users. Please update your code to use a newer model for the latest features and improvements.
+2026-03-15 10:49:45,310 - ai.ai_generator - INFO - Enhancing product: WD 4TB Gaming Drive Works with Playstation 4 Portable External Hard Drive
+2026-03-15 10:49:45,911 - ai.ai_generator - ERROR - Failed to enhance product 'WD 4TB Gaming Drive Works with Playstation 4 Portable External Hard Drive' with AI. Error: 404 This model models/gemini-2.0-flash is no longer available to new users. Please update your code to use a newer model for the latest features and improvements.
+2026-03-15 10:49:45,911 - ai.ai_generator - INFO - Enhancing product: Mens Cotton Jacket
+2026-03-15 10:49:46,444 - ai.ai_generator - ERROR - Failed to enhance product 'Mens Cotton Jacket' with AI. Error: 404 This model models/gemini-2.0-flash is no longer available to new users. Please update your code to use a newer model for the latest features and improvements.
+2026-03-15 10:49:46,444 - ai.ai_generator - INFO - Enhancing product: Mens Casual Premium Slim Fit T-Shirts 
+2026-03-15 10:49:46,994 - ai.ai_generator - ERROR - Failed to enhance product 'Mens Casual Premium Slim Fit T-Shirts ' with AI. Error: 404 This model models/gemini-2.0-flash is no longer available to new users. Please update your code to use a newer model for the latest features and improvements.
+2026-03-15 10:49:46,994 - ai.ai_generator - INFO - Enhancing product: Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops
+2026-03-15 10:49:47,509 - ai.ai_generator - ERROR - Failed to enhance product 'Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops' with AI. Error: 404 This model models/gemini-2.0-flash is no longer available to new users. Please update your code to use a newer model for the latest features and improvements.
+2026-03-15 10:49:47,509 - ai.ai_generator - INFO - Enhancing product: Solid Gold Petite Micropave 
+2026-03-15 10:49:48,091 - ai.ai_generator - ERROR - Failed to enhance product 'Solid Gold Petite Micropave ' with AI. Error: 404 This model models/gemini-2.0-flash is no longer available to new users. Please update your code to use a newer model for the latest features and improvements.
+2026-03-15 10:49:48,091 - ai.ai_generator - INFO - Enhancing product: Rain Jacket Women Windbreaker Striped Climbing Raincoats
+2026-03-15 10:49:48,610 - ai.ai_generator - ERROR - Failed to enhance product 'Rain Jacket Women Windbreaker Striped Climbing Raincoats' with AI. Error: 404 This model models/gemini-2.0-flash is no longer available to new users. Please update your code to use a newer model for the latest features and improvements.
+2026-03-15 10:49:48,610 - ai.ai_generator - INFO - Enhancing product: DANVOUY Womens T Shirt Casual Cotton Short
+2026-03-15 10:49:49,193 - ai.ai_generator - ERROR - Failed to enhance product 'DANVOUY Womens T Shirt Casual Cotton Short' with AI. Error: 404 This model models/gemini-2.0-flash is no longer available to new users. Please update your code to use a newer model for the latest features and improvements.
+2026-03-15 10:49:49,193 - __main__ - ERROR - AI enhancement failed.
+2026-03-15 10:50:00,304 - __main__ - INFO - Starting AI Dropshipping Pipeline...
+2026-03-15 10:50:00,304 - scrapers.data_scraper - INFO - Starting data fetching in MOCK mode.
+2026-03-15 10:50:00,304 - scrapers.clients.mock_client - INFO - Fetching mock data from URL: https://fakestoreapi.com/products
+2026-03-15 10:50:00,901 - scrapers.clients.mock_client - INFO - Successfully fetched 20 mock products.
+2026-03-15 10:50:00,901 - scrapers.data_scraper - INFO - Fetched 20 raw products.
+2026-03-15 10:50:00,901 - filters.data_filter - INFO - Starting product filtering and shortlisting process...
+2026-03-15 10:50:00,901 - filters.data_filter - INFO - Initial product count: 20
+2026-03-15 10:50:00,901 - filters.data_filter - INFO - Products after filtering: 8
+2026-03-15 10:50:00,901 - filters.data_filter - INFO - Final shortlist count: 8
+2026-03-15 10:50:00,901 - __main__ - INFO - Enhancing 8 products with Gemini AI...
+2026-03-15 10:50:00,901 - ai.ai_generator - INFO - Enhancing product: Silicon Power 256GB SSD 3D NAND A55 SLC Cache Performance Boost SATA III 2.5
+2026-03-15 10:50:07,966 - ai.ai_generator - INFO - Successfully generated AI content for 'Silicon Power 256GB SSD 3D NAND A55 SLC Cache Performance Boost SATA III 2.5'.
+2026-03-15 10:50:07,966 - ai.ai_generator - INFO - Enhancing product: WD 4TB Gaming Drive Works with Playstation 4 Portable External Hard Drive
+2026-03-15 10:50:14,694 - ai.ai_generator - INFO - Successfully generated AI content for 'WD 4TB Gaming Drive Works with Playstation 4 Portable External Hard Drive'.
+2026-03-15 10:50:14,694 - ai.ai_generator - INFO - Enhancing product: Mens Cotton Jacket
+2026-03-15 10:50:21,192 - ai.ai_generator - INFO - Successfully generated AI content for 'Mens Cotton Jacket'.
+2026-03-15 10:50:21,192 - ai.ai_generator - INFO - Enhancing product: Mens Casual Premium Slim Fit T-Shirts 
+2026-03-15 10:50:28,653 - ai.ai_generator - INFO - Successfully generated AI content for 'Mens Casual Premium Slim Fit T-Shirts '.
+2026-03-15 10:50:28,654 - ai.ai_generator - INFO - Enhancing product: Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops
+2026-03-15 10:50:36,632 - ai.ai_generator - INFO - Successfully generated AI content for 'Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops'.
+2026-03-15 10:50:36,632 - ai.ai_generator - INFO - Enhancing product: Solid Gold Petite Micropave 
+2026-03-15 10:50:45,626 - ai.ai_generator - INFO - Successfully generated AI content for 'Solid Gold Petite Micropave '.
+2026-03-15 10:50:45,627 - ai.ai_generator - INFO - Enhancing product: Rain Jacket Women Windbreaker Striped Climbing Raincoats
+2026-03-15 10:50:54,943 - ai.ai_generator - INFO - Successfully generated AI content for 'Rain Jacket Women Windbreaker Striped Climbing Raincoats'.
+2026-03-15 10:50:54,943 - ai.ai_generator - INFO - Enhancing product: DANVOUY Womens T Shirt Casual Cotton Short
+2026-03-15 10:51:01,884 - ai.ai_generator - INFO - Successfully generated AI content for 'DANVOUY Womens T Shirt Casual Cotton Short'.
+2026-03-15 10:51:02,004 - db.db_publisher - ERROR - Database Error: (psycopg2.OperationalError) could not translate host name "mexico#293]@db.hhstzneuaywltphusmde.supabase.co" to address: A non-recoverable error occurred during a database lookup. 
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-15 10:51:02,004 - __main__ - INFO - Pipeline completed successfully!
+2026-03-15 10:51:55,477 - __main__ - INFO - Starting AI Dropshipping Pipeline...
+2026-03-15 10:51:55,477 - scrapers.data_scraper - INFO - Starting data fetching in MOCK mode.
+2026-03-15 10:51:55,477 - scrapers.clients.mock_client - INFO - Fetching mock data from URL: https://fakestoreapi.com/products
+2026-03-15 10:51:56,071 - scrapers.clients.mock_client - INFO - Successfully fetched 20 mock products.
+2026-03-15 10:51:56,079 - scrapers.data_scraper - INFO - Fetched 20 raw products.
+2026-03-15 10:51:56,079 - filters.data_filter - INFO - Starting product filtering and shortlisting process...
+2026-03-15 10:51:56,079 - filters.data_filter - INFO - Initial product count: 20
+2026-03-15 10:51:56,083 - filters.data_filter - INFO - Products after filtering: 8
+2026-03-15 10:51:56,083 - filters.data_filter - INFO - Final shortlist count: 8
+2026-03-15 10:51:56,083 - __main__ - INFO - Enhancing 8 products with Gemini AI...
+2026-03-15 10:51:56,083 - ai.ai_generator - INFO - Enhancing product: Silicon Power 256GB SSD 3D NAND A55 SLC Cache Performance Boost SATA III 2.5
+2026-03-15 10:52:02,953 - ai.ai_generator - INFO - Successfully generated AI content for 'Silicon Power 256GB SSD 3D NAND A55 SLC Cache Performance Boost SATA III 2.5'.
+2026-03-15 10:52:02,954 - ai.ai_generator - INFO - Enhancing product: WD 4TB Gaming Drive Works with Playstation 4 Portable External Hard Drive
+2026-03-15 10:52:11,650 - ai.ai_generator - INFO - Successfully generated AI content for 'WD 4TB Gaming Drive Works with Playstation 4 Portable External Hard Drive'.
+2026-03-15 10:52:11,650 - ai.ai_generator - INFO - Enhancing product: Mens Cotton Jacket
+2026-03-15 10:52:18,594 - ai.ai_generator - INFO - Successfully generated AI content for 'Mens Cotton Jacket'.
+2026-03-15 10:52:18,594 - ai.ai_generator - INFO - Enhancing product: Mens Casual Premium Slim Fit T-Shirts 
+2026-03-15 10:52:25,673 - ai.ai_generator - INFO - Successfully generated AI content for 'Mens Casual Premium Slim Fit T-Shirts '.
+2026-03-15 10:52:25,673 - ai.ai_generator - INFO - Enhancing product: Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops
+2026-03-15 10:52:35,484 - ai.ai_generator - INFO - Successfully generated AI content for 'Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops'.
+2026-03-15 10:52:35,485 - ai.ai_generator - INFO - Enhancing product: Solid Gold Petite Micropave 
+2026-03-15 10:52:45,281 - ai.ai_generator - INFO - Successfully generated AI content for 'Solid Gold Petite Micropave '.
+2026-03-15 10:52:45,293 - ai.ai_generator - INFO - Enhancing product: Rain Jacket Women Windbreaker Striped Climbing Raincoats
+2026-03-15 10:52:52,411 - ai.ai_generator - INFO - Successfully generated AI content for 'Rain Jacket Women Windbreaker Striped Climbing Raincoats'.
+2026-03-15 10:52:52,423 - ai.ai_generator - INFO - Enhancing product: DANVOUY Womens T Shirt Casual Cotton Short
+2026-03-15 10:52:58,687 - ai.ai_generator - INFO - Successfully generated AI content for 'DANVOUY Womens T Shirt Casual Cotton Short'.
+2026-03-15 10:52:58,733 - db.db_publisher - ERROR - Database Error: (psycopg2.OperationalError) could not translate host name "mexico#293]@db.hhstzneuaywltphusmde.supabase.co" to address: A non-recoverable error occurred during a database lookup. 
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-15 10:52:58,733 - __main__ - INFO - Pipeline completed successfully!
+2026-03-15 10:54:13,923 - __main__ - INFO - Starting AI Dropshipping Pipeline...
+2026-03-15 10:54:13,923 - scrapers.data_scraper - INFO - Starting data fetching in MOCK mode.
+2026-03-15 10:54:13,923 - scrapers.clients.mock_client - INFO - Fetching mock data from URL: https://fakestoreapi.com/products
+2026-03-15 10:54:14,529 - scrapers.clients.mock_client - INFO - Successfully fetched 20 mock products.
+2026-03-15 10:54:14,545 - scrapers.data_scraper - INFO - Fetched 20 raw products.
+2026-03-15 10:54:14,545 - filters.data_filter - INFO - Starting product filtering and shortlisting process...
+2026-03-15 10:54:14,545 - filters.data_filter - INFO - Initial product count: 20
+2026-03-15 10:54:14,545 - filters.data_filter - INFO - Products after filtering: 8
+2026-03-15 10:54:14,545 - filters.data_filter - INFO - Final shortlist count: 8
+2026-03-15 10:54:14,545 - __main__ - INFO - Enhancing 8 products with Gemini AI...
+2026-03-15 10:54:14,545 - ai.ai_generator - INFO - Enhancing product: Silicon Power 256GB SSD 3D NAND A55 SLC Cache Performance Boost SATA III 2.5
+2026-03-15 10:54:23,899 - ai.ai_generator - INFO - Successfully generated AI content for 'Silicon Power 256GB SSD 3D NAND A55 SLC Cache Performance Boost SATA III 2.5'.
+2026-03-15 10:54:23,899 - ai.ai_generator - INFO - Enhancing product: WD 4TB Gaming Drive Works with Playstation 4 Portable External Hard Drive
+2026-03-15 10:54:29,686 - ai.ai_generator - INFO - Successfully generated AI content for 'WD 4TB Gaming Drive Works with Playstation 4 Portable External Hard Drive'.
+2026-03-15 10:54:29,686 - ai.ai_generator - INFO - Enhancing product: Mens Cotton Jacket
+2026-03-15 10:54:35,261 - ai.ai_generator - INFO - Successfully generated AI content for 'Mens Cotton Jacket'.
+2026-03-15 10:54:35,261 - ai.ai_generator - INFO - Enhancing product: Mens Casual Premium Slim Fit T-Shirts 
+2026-03-15 10:54:42,468 - ai.ai_generator - INFO - Successfully generated AI content for 'Mens Casual Premium Slim Fit T-Shirts '.
+2026-03-15 10:54:42,468 - ai.ai_generator - INFO - Enhancing product: Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops
+2026-03-15 10:54:52,774 - ai.ai_generator - INFO - Successfully generated AI content for 'Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops'.
+2026-03-15 10:54:52,774 - ai.ai_generator - INFO - Enhancing product: Solid Gold Petite Micropave 
+2026-03-15 10:55:03,705 - ai.ai_generator - INFO - Successfully generated AI content for 'Solid Gold Petite Micropave '.
+2026-03-15 10:55:03,705 - ai.ai_generator - INFO - Enhancing product: Rain Jacket Women Windbreaker Striped Climbing Raincoats
+2026-03-15 10:55:12,905 - ai.ai_generator - INFO - Successfully generated AI content for 'Rain Jacket Women Windbreaker Striped Climbing Raincoats'.
+2026-03-15 10:55:12,905 - ai.ai_generator - INFO - Enhancing product: DANVOUY Womens T Shirt Casual Cotton Short
+2026-03-15 10:55:21,327 - ai.ai_generator - INFO - Successfully generated AI content for 'DANVOUY Womens T Shirt Casual Cotton Short'.
+2026-03-15 10:55:21,422 - db.db_publisher - ERROR - Database Error: (psycopg2.OperationalError) could not translate host name "mexico#293]@db.hhstzneuaywltphusmde.supabase.co" to address: A non-recoverable error occurred during a database lookup. 
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-15 10:55:21,426 - __main__ - INFO - Pipeline completed successfully!
+2026-03-15 10:56:19,429 - __main__ - INFO - Starting AI Dropshipping Pipeline...
+2026-03-15 10:56:19,429 - scrapers.data_scraper - INFO - Starting data fetching in MOCK mode.
+2026-03-15 10:56:19,429 - scrapers.clients.mock_client - INFO - Fetching mock data from URL: https://fakestoreapi.com/products
+2026-03-15 10:56:20,022 - scrapers.clients.mock_client - INFO - Successfully fetched 20 mock products.
+2026-03-15 10:56:20,025 - scrapers.data_scraper - INFO - Fetched 20 raw products.
+2026-03-15 10:56:20,026 - filters.data_filter - INFO - Starting product filtering and shortlisting process...
+2026-03-15 10:56:20,029 - filters.data_filter - INFO - Initial product count: 20
+2026-03-15 10:56:20,033 - filters.data_filter - INFO - Products after filtering: 8
+2026-03-15 10:56:20,033 - filters.data_filter - INFO - Final shortlist count: 8
+2026-03-15 10:56:20,033 - __main__ - INFO - Enhancing 8 products with Gemini AI...
+2026-03-15 10:56:20,033 - ai.ai_generator - INFO - Enhancing product: Silicon Power 256GB SSD 3D NAND A55 SLC Cache Performance Boost SATA III 2.5
+2026-03-15 10:56:27,671 - ai.ai_generator - INFO - Successfully generated AI content for 'Silicon Power 256GB SSD 3D NAND A55 SLC Cache Performance Boost SATA III 2.5'.
+2026-03-15 10:56:27,672 - ai.ai_generator - INFO - Enhancing product: WD 4TB Gaming Drive Works with Playstation 4 Portable External Hard Drive
+2026-03-15 10:56:38,417 - ai.ai_generator - INFO - Successfully generated AI content for 'WD 4TB Gaming Drive Works with Playstation 4 Portable External Hard Drive'.
+2026-03-15 10:56:38,417 - ai.ai_generator - INFO - Enhancing product: Mens Cotton Jacket
+2026-03-15 10:56:45,380 - ai.ai_generator - INFO - Successfully generated AI content for 'Mens Cotton Jacket'.
+2026-03-15 10:56:45,380 - ai.ai_generator - INFO - Enhancing product: Mens Casual Premium Slim Fit T-Shirts 
+2026-03-15 10:56:51,577 - ai.ai_generator - INFO - Successfully generated AI content for 'Mens Casual Premium Slim Fit T-Shirts '.
+2026-03-15 10:56:51,587 - ai.ai_generator - INFO - Enhancing product: Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops
+2026-03-15 10:57:00,355 - ai.ai_generator - INFO - Successfully generated AI content for 'Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops'.
+2026-03-15 10:57:00,356 - ai.ai_generator - INFO - Enhancing product: Solid Gold Petite Micropave 
+2026-03-15 10:57:07,486 - ai.ai_generator - INFO - Successfully generated AI content for 'Solid Gold Petite Micropave '.
+2026-03-15 10:57:07,486 - ai.ai_generator - INFO - Enhancing product: Rain Jacket Women Windbreaker Striped Climbing Raincoats
+2026-03-15 10:57:16,435 - ai.ai_generator - INFO - Successfully generated AI content for 'Rain Jacket Women Windbreaker Striped Climbing Raincoats'.
+2026-03-15 10:57:16,435 - ai.ai_generator - INFO - Enhancing product: DANVOUY Womens T Shirt Casual Cotton Short
+2026-03-15 10:57:21,941 - ai.ai_generator - INFO - Successfully generated AI content for 'DANVOUY Womens T Shirt Casual Cotton Short'.
+2026-03-15 10:57:23,964 - db.db_publisher - ERROR - Database Error: (psycopg2.OperationalError) connection to server at "db.hhstzneuaywltphusmde.supabase.co" (2406:da14:271:991a:2f2f:1a63:5311:7e14), port 5432 failed: FATAL:  password authentication failed for user "postgres"
+connection to server at "db.hhstzneuaywltphusmde.supabase.co" (2406:da14:271:991a:2f2f:1a63:5311:7e14), port 5432 failed: FATAL:  password authentication failed for user "postgres"
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-15 10:57:25,909 - __main__ - INFO - Pipeline completed successfully!
+2026-03-15 11:13:24,019 - __main__ - INFO - Starting AI Dropshipping Pipeline...
+2026-03-15 11:13:24,019 - scrapers.data_scraper - INFO - Starting data fetching in MOCK mode.
+2026-03-15 11:13:24,019 - scrapers.clients.mock_client - INFO - Fetching mock data from URL: https://fakestoreapi.com/products
+2026-03-15 11:13:25,776 - scrapers.clients.mock_client - INFO - Successfully fetched 20 mock products.
+2026-03-15 11:13:25,776 - scrapers.data_scraper - INFO - Fetched 20 raw products.
+2026-03-15 11:13:25,776 - filters.data_filter - INFO - Starting product filtering and shortlisting process...
+2026-03-15 11:13:25,776 - filters.data_filter - INFO - Initial product count: 20
+2026-03-15 11:13:25,787 - filters.data_filter - INFO - Products after filtering: 8
+2026-03-15 11:13:25,787 - filters.data_filter - INFO - Final shortlist count: 8
+2026-03-15 11:13:25,787 - __main__ - INFO - Enhancing 8 products with Gemini AI...
+2026-03-15 11:13:25,787 - ai.ai_generator - INFO - Enhancing product: Silicon Power 256GB SSD 3D NAND A55 SLC Cache Performance Boost SATA III 2.5
+2026-03-15 11:13:33,072 - ai.ai_generator - INFO - Successfully generated AI content for 'Silicon Power 256GB SSD 3D NAND A55 SLC Cache Performance Boost SATA III 2.5'.
+2026-03-15 11:13:33,072 - ai.ai_generator - INFO - Enhancing product: WD 4TB Gaming Drive Works with Playstation 4 Portable External Hard Drive
+2026-03-15 11:13:41,539 - ai.ai_generator - INFO - Successfully generated AI content for 'WD 4TB Gaming Drive Works with Playstation 4 Portable External Hard Drive'.
+2026-03-15 11:13:41,548 - ai.ai_generator - INFO - Enhancing product: Mens Cotton Jacket
+2026-03-15 11:13:52,123 - ai.ai_generator - INFO - Successfully generated AI content for 'Mens Cotton Jacket'.
+2026-03-15 11:13:52,123 - ai.ai_generator - INFO - Enhancing product: Mens Casual Premium Slim Fit T-Shirts 
+2026-03-15 11:14:00,290 - ai.ai_generator - INFO - Successfully generated AI content for 'Mens Casual Premium Slim Fit T-Shirts '.
+2026-03-15 11:14:00,290 - ai.ai_generator - INFO - Enhancing product: Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops
+2026-03-15 11:14:07,802 - ai.ai_generator - INFO - Successfully generated AI content for 'Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops'.
+2026-03-15 11:14:07,802 - ai.ai_generator - INFO - Enhancing product: Solid Gold Petite Micropave 
+2026-03-15 11:14:16,082 - ai.ai_generator - INFO - Successfully generated AI content for 'Solid Gold Petite Micropave '.
+2026-03-15 11:14:16,082 - ai.ai_generator - INFO - Enhancing product: Rain Jacket Women Windbreaker Striped Climbing Raincoats
+2026-03-15 11:14:25,170 - ai.ai_generator - INFO - Successfully generated AI content for 'Rain Jacket Women Windbreaker Striped Climbing Raincoats'.
+2026-03-15 11:14:25,170 - ai.ai_generator - INFO - Enhancing product: DANVOUY Womens T Shirt Casual Cotton Short
+2026-03-15 11:14:32,663 - ai.ai_generator - INFO - Successfully generated AI content for 'DANVOUY Womens T Shirt Casual Cotton Short'.
+2026-03-15 11:14:34,777 - db.db_publisher - ERROR - Database Error: (psycopg2.OperationalError) connection to server at "aws-1-ap-northeast-1.pooler.supabase.com" (57.182.231.186), port 5432 failed: FATAL:  password authentication failed for user "postgres"
+connection to server at "aws-1-ap-northeast-1.pooler.supabase.com" (57.182.231.186), port 5432 failed: FATAL:  password authentication failed for user "postgres"
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-15 11:14:36,639 - __main__ - INFO - Pipeline completed successfully!
+2026-03-15 14:34:13,180 - __main__ - INFO - Starting AI Dropshipping Pipeline...
+2026-03-15 14:34:13,182 - scrapers.data_scraper - INFO - Starting data fetching in MOCK mode.
+2026-03-15 14:34:13,182 - scrapers.clients.mock_client - INFO - Fetching mock data from URL: https://fakestoreapi.com/products
+2026-03-15 14:34:14,667 - scrapers.clients.mock_client - INFO - Successfully fetched 20 mock products.
+2026-03-15 14:34:14,677 - scrapers.data_scraper - INFO - Fetched 20 raw products.
+2026-03-15 14:34:14,677 - filters.data_filter - INFO - Starting product filtering and shortlisting process...
+2026-03-15 14:34:14,677 - filters.data_filter - INFO - Initial product count: 20
+2026-03-15 14:34:14,685 - filters.data_filter - INFO - Products after filtering: 8
+2026-03-15 14:34:14,685 - filters.data_filter - INFO - Final shortlist count: 8
+2026-03-15 14:34:14,685 - __main__ - INFO - Enhancing 8 products with Gemini AI...
+2026-03-15 14:34:14,685 - ai.ai_generator - INFO - Enhancing product: Silicon Power 256GB SSD 3D NAND A55 SLC Cache Performance Boost SATA III 2.5
+2026-03-15 14:34:21,623 - ai.ai_generator - INFO - Successfully generated AI content for 'Silicon Power 256GB SSD 3D NAND A55 SLC Cache Performance Boost SATA III 2.5'.
+2026-03-15 14:34:21,623 - ai.ai_generator - INFO - Enhancing product: WD 4TB Gaming Drive Works with Playstation 4 Portable External Hard Drive
+2026-03-15 14:34:29,006 - ai.ai_generator - INFO - Successfully generated AI content for 'WD 4TB Gaming Drive Works with Playstation 4 Portable External Hard Drive'.
+2026-03-15 14:34:29,007 - ai.ai_generator - INFO - Enhancing product: Mens Cotton Jacket
+2026-03-15 14:34:36,670 - ai.ai_generator - INFO - Successfully generated AI content for 'Mens Cotton Jacket'.
+2026-03-15 14:34:36,670 - ai.ai_generator - INFO - Enhancing product: Mens Casual Premium Slim Fit T-Shirts 
+2026-03-15 14:34:43,338 - ai.ai_generator - INFO - Successfully generated AI content for 'Mens Casual Premium Slim Fit T-Shirts '.
+2026-03-15 14:34:43,338 - ai.ai_generator - INFO - Enhancing product: Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops
+2026-03-15 14:34:52,099 - ai.ai_generator - INFO - Successfully generated AI content for 'Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops'.
+2026-03-15 14:34:52,099 - ai.ai_generator - INFO - Enhancing product: Solid Gold Petite Micropave 
+2026-03-15 14:34:58,196 - ai.ai_generator - INFO - Successfully generated AI content for 'Solid Gold Petite Micropave '.
+2026-03-15 14:34:58,196 - ai.ai_generator - INFO - Enhancing product: Rain Jacket Women Windbreaker Striped Climbing Raincoats
+2026-03-15 14:35:07,509 - ai.ai_generator - INFO - Successfully generated AI content for 'Rain Jacket Women Windbreaker Striped Climbing Raincoats'.
+2026-03-15 14:35:07,509 - ai.ai_generator - INFO - Enhancing product: DANVOUY Womens T Shirt Casual Cotton Short
+2026-03-15 14:35:13,723 - ai.ai_generator - INFO - Successfully generated AI content for 'DANVOUY Womens T Shirt Casual Cotton Short'.
+2026-03-15 14:35:15,999 - db.db_publisher - ERROR - Database Error: (psycopg2.OperationalError) connection to server at "aws-1-ap-northeast-1.pooler.supabase.com" (18.176.230.146), port 5432 failed: FATAL:  password authentication failed for user "postgres"
+connection to server at "aws-1-ap-northeast-1.pooler.supabase.com" (18.176.230.146), port 5432 failed: FATAL:  password authentication failed for user "postgres"
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-15 14:35:18,164 - __main__ - INFO - Pipeline completed successfully!
+2026-03-15 14:44:43,458 - __main__ - INFO - Starting AI Dropshipping Pipeline...
+2026-03-15 14:44:43,458 - scrapers.data_scraper - INFO - Starting data fetching in MOCK mode.
+2026-03-15 14:44:43,458 - scrapers.clients.mock_client - INFO - Fetching mock data from URL: https://fakestoreapi.com/products
+2026-03-15 14:44:45,238 - scrapers.clients.mock_client - INFO - Successfully fetched 20 mock products.
+2026-03-15 14:44:45,243 - scrapers.data_scraper - INFO - Fetched 20 raw products.
+2026-03-15 14:44:45,243 - filters.data_filter - INFO - Starting product filtering and shortlisting process...
+2026-03-15 14:44:45,243 - filters.data_filter - INFO - Initial product count: 20
+2026-03-15 14:44:45,243 - filters.data_filter - INFO - Products after filtering: 8
+2026-03-15 14:44:45,243 - filters.data_filter - INFO - Final shortlist count: 8
+2026-03-15 14:44:45,243 - __main__ - INFO - Enhancing 8 products with Gemini AI...
+2026-03-15 14:44:45,243 - ai.ai_generator - INFO - Enhancing product: Silicon Power 256GB SSD 3D NAND A55 SLC Cache Performance Boost SATA III 2.5
+2026-03-15 14:44:51,687 - ai.ai_generator - INFO - Successfully generated AI content for 'Silicon Power 256GB SSD 3D NAND A55 SLC Cache Performance Boost SATA III 2.5'.
+2026-03-15 14:44:51,687 - ai.ai_generator - INFO - Enhancing product: WD 4TB Gaming Drive Works with Playstation 4 Portable External Hard Drive
+2026-03-15 14:45:00,898 - ai.ai_generator - INFO - Successfully generated AI content for 'WD 4TB Gaming Drive Works with Playstation 4 Portable External Hard Drive'.
+2026-03-15 14:45:00,898 - ai.ai_generator - INFO - Enhancing product: Mens Cotton Jacket
+2026-03-15 14:45:06,753 - ai.ai_generator - INFO - Successfully generated AI content for 'Mens Cotton Jacket'.
+2026-03-15 14:45:06,753 - ai.ai_generator - INFO - Enhancing product: Mens Casual Premium Slim Fit T-Shirts 
+2026-03-15 14:45:15,074 - ai.ai_generator - INFO - Successfully generated AI content for 'Mens Casual Premium Slim Fit T-Shirts '.
+2026-03-15 14:45:15,074 - ai.ai_generator - INFO - Enhancing product: Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops
+2026-03-15 14:45:23,330 - ai.ai_generator - INFO - Successfully generated AI content for 'Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops'.
+2026-03-15 14:45:23,332 - ai.ai_generator - INFO - Enhancing product: Solid Gold Petite Micropave 
+2026-03-15 14:45:31,990 - ai.ai_generator - INFO - Successfully generated AI content for 'Solid Gold Petite Micropave '.
+2026-03-15 14:45:31,990 - ai.ai_generator - INFO - Enhancing product: Rain Jacket Women Windbreaker Striped Climbing Raincoats
+2026-03-15 14:45:39,396 - ai.ai_generator - INFO - Successfully generated AI content for 'Rain Jacket Women Windbreaker Striped Climbing Raincoats'.
+2026-03-15 14:45:39,396 - ai.ai_generator - INFO - Enhancing product: DANVOUY Womens T Shirt Casual Cotton Short
+2026-03-15 14:45:47,590 - ai.ai_generator - INFO - Successfully generated AI content for 'DANVOUY Womens T Shirt Casual Cotton Short'.
+2026-03-15 14:45:53,181 - db.db_publisher - INFO - Successfully staged 8 products.
+2026-03-15 14:45:56,875 - __main__ - INFO - Pipeline completed successfully!
